@@ -40,7 +40,7 @@ while there are processes in the ready_queue
 	run the process
 
 	while current process time remaining is greater than zero
-		if(time = (1/2)*process.CPU_Burst)
+		if(time >= (1/2)*process.CPU_Burst)
 			store the process.I/O_Burst in the device queue
 		endif
 	        decrement process time remaining

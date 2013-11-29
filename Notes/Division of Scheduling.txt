@@ -1,0 +1,6 @@
+SJF -> Ben
+SJR -> Ben
+FCFS -> Keith
+MFQ  -> Keith, Help from Dan w/ RR
+PS -> Dan
+RR -> Dan

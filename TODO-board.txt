@@ -2,3 +2,6 @@ create a design document
 
 //calculate CPU utilzation
 how often cpu is being used
+
+Design a storage system to hold the data
+*partial completed with queues

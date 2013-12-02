@@ -1,12 +1,12 @@
 #include <stdbool.h>
-#include "Queue.h"
+#include "ProcUtil.h"
 
 int main(int argc, char *argv[])
 {
 	//set the variables
 	int Select;
 	bool INTERACTIVE = false;
-    bool test = true;
+    bool test = false;
     FILE *DATA;
     if(argc !=4)
     {
@@ -21,10 +21,17 @@ int main(int argc, char *argv[])
 		exit(0);
 	}
 
+//setup the Data
+int total = atoi(argv[2]);
+int snapshottime = atoi(argv[3]);
+PROCESS Proc[total];
+InputFromFile(Proc,DATA);
+ListProcess(Proc,total);
+PS(Proc,total,snapshottime);
 
     if(test == true)
     {
-    Queue_test(DATA);
+    Array_test(DATA,argv[2]);
     }
 
 	//Interactive Mode

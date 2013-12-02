@@ -1,5 +1,5 @@
 //maintain all the queue functions
-#include "ProcUtil.c"
+#include "ProcUtil.h"
 #include <stdio.h>
 
 
@@ -37,7 +37,7 @@ static void _traverse (PROCNODE* PNode, void (*process) (void* dataPtr));
 static void _destroy (PROCNODE* PNode);
 
 
-void ListProcess (void* procPtr);
+void ListProcessQ (void* procPtr);
 void ProcessFromFile(QUEUE* list, FILE *InputFile);
-void SnapShot(int CurrentTime, int TimeInverval, QUEUE* list);
+void SnapShotQ(int CurrentTime, int TimeInverval, QUEUE* list);
 int Queue_test(FILE* INPUT);

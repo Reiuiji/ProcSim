@@ -334,7 +334,7 @@ void DisplayContents(QUEUE* list)
 	    Pre  stu is a pointer to a student
 	    Post data printed and line advanced
 */
-void ListProcess (void* procPtr)
+void ListProcessQ (void* procPtr)
 {
 	PROCESS Proc;
 
@@ -346,7 +346,7 @@ void ListProcess (void* procPtr)
 }   //ListProcess
 
 
-void SnapShot(int CurrentTime, int TimeInverval, QUEUE* list)
+void SnapShotQ(int CurrentTime, int TimeInverval, QUEUE* list)
 {
 
 }

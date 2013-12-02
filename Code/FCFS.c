@@ -3,22 +3,22 @@
 //Get total time for each process and store in an array
 //Then sort the processes based on arrival time. Use service time to set time intervals.
 
-//Send back to process scheduler in proper order.
+//Send back to process scheduler in proper order. 
 #include<stdio.h>
 #include<math.h>
 #include<ctype.h>
 #define ARRAY_SIZE( array ) sizeof( array ) / sizeof( array[0] )
-int n[];         //n must be global
-char queue[];       //queue variable should be global
-void FCFS(n[]);  //Function to sort by arrival time
-char arrival(queue);      //Function to get arrival time
+int n[]         //n must be global
+char queue[]       //queue variable should be global
+void FCFS(n[])  //Function to sort by arrival time
+char arrival(queue)      //Function to get arrival time
 
 void main(){
   arrival(file);
   FCFS(n[])
 }
 
-FCFS(int n[]){
+FCFS(int n[]){      
   int s=ARRAY_SIZE(n);
   for(int j=0; j=s-1;j++){    //Sorting by arrival time
    for(int i=0; i=s-1;i++){
@@ -28,18 +28,12 @@ FCFS(int n[]){
         n[i+1]=temp;
         }
       }
-<<<<<<< HEAD
-
-  }
-
-=======
   
     }
 }
 
 
   
->>>>>>> ac22ed3e02d2ced4088502fd28ce7a12c833c802
   arrival(char queue[]){
     
   
@@ -50,6 +44,6 @@ FCFS(int n[]){
     
     return n[];
   }
-
-
+  
+  
 

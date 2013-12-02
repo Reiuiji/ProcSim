@@ -29,9 +29,14 @@ FCFS(int n[]){
         }
       }
   
-  }
+    }
+}
+
+
   
   arrival(char queue[]){
+    fd=fopen("queue.c",r);
+  }
     //Somehow count characters to read in arrival times from file
     File *file;
     file=fopen("queue.c", r);

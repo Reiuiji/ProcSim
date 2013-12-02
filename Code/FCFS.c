@@ -7,25 +7,26 @@
 #include<stdio.h>
 #include<math.h>
 #include<ctype.h>
+#include"ProcUtil.h"
 #define ARRAY_SIZE( array ) sizeof( array ) / sizeof( array[0] )
-int n[]         //n must be global
+PROCESS Proc[]         //proc must be global
 char queue[]       //queue variable should be global
-void FCFS(n[])  //Function to sort by arrival time
+void FCFS(Proc[])  //Function to sort by arrival time
 char arrival(queue)      //Function to get arrival time
 
 void main(){
   arrival(file);
-  FCFS(n[])
+  FCFS(Proc[]);
 }
 
 FCFS(int n[]){      
   int s=ARRAY_SIZE(n);
   for(int j=0; j=s-1;j++){    //Sorting by arrival time
    for(int i=0; i=s-1;i++){
-      if(n[i]>n[i+1]){
-        int temp=n[i];
-        n[i]=n[i+1];
-        n[i+1]=temp;
+      if(Proc[i]>Proc[i+1]){
+        int temp=Proc[i];
+        Proc[i]=Proc[i+1];
+        Proc[i+1]=temp;
         }
       }
   
@@ -42,7 +43,7 @@ FCFS(int n[]){
     file=fopen("queue.c", r);
     //somehow read in arrival times
     
-    return n[];
+    return file;
   }
   
   

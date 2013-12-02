@@ -28,14 +28,26 @@ FCFS(int n[]){
         n[i+1]=temp;
         }
       }
+<<<<<<< HEAD
 
   }
 
+=======
+  
+    }
+}
+
+
+  
+>>>>>>> ac22ed3e02d2ced4088502fd28ce7a12c833c802
   arrival(char queue[]){
+    
+  
     //Somehow count characters to read in arrival times from file
     File *file;
     file=fopen("queue.c", r);
     //somehow read in arrival times
+    
     return n[];
   }
 

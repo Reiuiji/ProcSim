@@ -9,5 +9,7 @@ struct queue1;
 struct queue2;
 struct queue3;
 void main(){
+
+// Implementation of MFQ
   
 }

@@ -10,7 +10,7 @@
 #include"ProcUtil.h"
 #define ARRAY_SIZE( array ) sizeof( array ) / sizeof( array[0] )
 PROCESS Proc[]         //proc must be global
-char queue[]       //queue variable should be global
+int queue[]       //queue variable should be global
 void FCFS(Proc[])  //Function to sort by arrival time
 
 

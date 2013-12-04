@@ -26,7 +26,7 @@ QUEUE* QUEUE_Destroy (QUEUE* Que);//delete the queue
 bool QUEUE_Insert (QUEUE* Que, void* Ptr);//insert to the queue
 bool QUEUE_Delete (QUEUE* Que, int PID);//delete from the queue
 PROCESS* QUEUE_Retrieve (QUEUE* Que, int PID);
-void  QUEUE_Traverse (QUEUE* Que, void (*process)(void* dataPtr));
+void QUEUE_Traverse (QUEUE* Que, void (*process) (void* dataPtr));
 bool QUEUE_Empty (QUEUE* Que);
 bool QUEUE_Full  (QUEUE* Que);
 int  QUEUE_Count (QUEUE* Que);

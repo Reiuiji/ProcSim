@@ -12,17 +12,29 @@
 PROCESS Proc[]         //proc must be global
 char queue[]       //queue variable should be global
 void FCFS(Proc[])  //Function to sort by arrival time
-char arrival(queue)      //Function to get arrival time
+
+
+int FCFS(Proc[])  //Function to sort by arrival time{
+
+for(int i=0;i=sizeof(Proc)-1;i++){
+queue[i]=Proc[i];
+return queue;
+}
+void main(){
+    FCFS(Proc[]);
+}
+
+/*char arrival(queue)      //Function to get arrival time
 
 void main(){
   arrival(file);
   FCFS(Proc[]);
 }
 
-FCFS(int n[]){      
-  int s=ARRAY_SIZE(n);
-  for(int j=0; j=s-1;j++){    //Sorting by arrival time
-   for(int i=0; i=s-1;i++){
+FCFS(Proc[]){      
+  int s=ARRAY_SIZE(Proc);
+  for(int j=0; j=s-1;j++){    //Sorting by process ID, not arrival time
+   for(int i=0; i=s-1;i++){   
       if(Proc[i]>Proc[i+1]){
         int temp=Proc[i];
         Proc[i]=Proc[i+1];
@@ -35,7 +47,7 @@ FCFS(int n[]){
 
 
   
-  arrival(char queue[]){
+  arrival(char queue1[]){
     
   
     //Somehow count characters to read in arrival times from file
@@ -45,6 +57,9 @@ FCFS(int n[]){
     
     return file;
   }
-  
-  
+*/
 
+
+
+
+  

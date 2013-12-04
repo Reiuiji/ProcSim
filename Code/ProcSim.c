@@ -35,6 +35,8 @@ int main(int argc, char *argv[])
 
 //just runs the Priority Sort algorithm
     PS(Proc,SIMINFO);
+    printf("[DEBUG]: outputing test\n");
+    SnapShot(Proc, SIMINFO);
 
     if(test == true)
     {

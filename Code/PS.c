@@ -31,14 +31,14 @@ int PS(PROCESS Proc[], SIMULATION Sim)
 
     int pos = 0;
     int Time = 0;
-    while(Sim.TotalProc > 0)
-    {
-
-
-        //void SnapShot(Proc, Sim, "PS");
-        //TOTAL--;//one less process
-        pos++;//next on the list
-    }
+//    while(Sim.TotalProc > 0)
+//    {
+//
+//
+//        //void SnapShot(Proc, Sim, "PS");
+//        //TOTAL--;//one less process
+//        pos++;//next on the list
+//    }
 
     return 0;
 

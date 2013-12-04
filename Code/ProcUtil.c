@@ -66,7 +66,63 @@ void ListProcess (PROCESS Proc[],SIMULATION SIM)
     return;
 }   //ListProcess
 
+void DisplayReadyQueue(PROCESS Proc[],SIMULATION SIM)
+{
+    int pos;
+    bool FirstOccur = true;
 
+    printf("current state of ready queue: ");
+
+    for(pos = 0; pos < SIM.TotalProc; pos++)
+    {
+        if(FirstOccur == false)
+        {
+            printf("-");
+        }
+        if(Proc[pos].ReadyQueue == true)
+        {
+            printf("%i",Proc[pos].P_ID);
+            if(FirstOccur == true)
+            {
+                FirstOccur = false;
+            }
+        }
+    }
+    if(FirstOccur == true)
+    {
+        printf("EMPTY");
+    }
+    printf("\n");
+}
+
+void DisplayDeviceQueue(PROCESS Proc[],SIMULATION SIM)
+{
+    int pos;
+    bool FirstOccur = true;
+
+    printf("current state of device queue: ");
+
+    for(pos = 0; pos < SIM.TotalProc; pos++)
+    {
+        if(FirstOccur == false)
+        {
+            printf("-");
+        }
+        if(Proc[pos].DeviceQueue == true)
+        {
+            printf("%i",Proc[pos].P_ID);
+            if(FirstOccur == true)
+            {
+                FirstOccur = false;
+            }
+        }
+    }
+    if(FirstOccur == true)
+    {
+        printf("EMPTY");
+    }
+    printf("\n");
+}
 
 void SnapShot(PROCESS Proc[], SIMULATION SIM)//, char **)
 {
@@ -78,12 +134,10 @@ void SnapShot(PROCESS Proc[], SIMULATION SIM)//, char **)
         {
             printf("CPU loading job %i : CPU burst (%i) IO burst (%i) \n",Proc[0].P_ID, Proc[0].CPU_WITH_IO, Proc[0].IO_BURST);
         }
-        printf("current state of ready queue: ");
-        for(i = 0 ; i < SIM.TotalProc; i++)
-        {
-//current state of device queue:
-//            $ {display the first ten in IO queue} \nextline
-        }
+
+DisplayReadyQueue(Proc, SIM);
+DisplayDeviceQueue(Proc, SIM);
+
     }
 }
 

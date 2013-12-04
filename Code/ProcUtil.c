@@ -56,6 +56,9 @@ int InputFromFile(PROCESS Proc[], FILE *InputFile)
 void ListProcess (PROCESS Proc[],SIMULATION SIM)
 {
     int pos;
+    bool FullDisplay = true;
+    if(FullDisplay == false)
+    {
     printf("+---------+---------+---------+---------+\n");
     printf("|PID      |CPU_BURST|IO_Burst |Priority |\n");
     for(pos = 0; pos < SIM.TotalProc; pos++)
@@ -63,7 +66,19 @@ void ListProcess (PROCESS Proc[],SIMULATION SIM)
         printf("| %-7i | %-7i | %-7i | %-7i |\n", Proc[pos].P_ID, Proc[pos].CPU_BURST, Proc[pos].IO_BURST, Proc[pos].PRIORITY);
     }
     printf("+---------+---------+---------+---------+\n");
-    return;
+    }
+    else
+     {
+     printf("+-----+---------+--------+--------+-----+-----+------+-----+-----+-----+-----+\n");
+    printf("| PID |CPU_BURST|IO_Burst|Priority|RTime|WTime|TATime|INCPU|IN IO|D Que|R Que|\n");
+    for(pos = 0; pos < SIM.TotalProc; pos++)
+    {
+        printf("| %-3i | %-7i | %-6i | %-6i | %-3i | %-3i | %-4i | %-3i | %-3i | %-3i | %-3i |\n", Proc[pos].P_ID, Proc[pos].CPU_BURST, Proc[pos].IO_BURST, Proc[pos].PRIORITY, Proc[pos].ResponseTime, Proc[pos].WaitTime, Proc[pos].TurnAroundTime, Proc[pos].InCPU, Proc[pos].InIO, Proc[pos].DeviceQueue, Proc[pos].ReadyQueue);
+    }
+     printf("+-----+---------+--------+--------+-----+-----+------+-----+-----+-----+-----+\n");
+    }
+
+	return;
 }   //ListProcess
 
 void DisplayReadyQueue(PROCESS Proc[],SIMULATION SIM)

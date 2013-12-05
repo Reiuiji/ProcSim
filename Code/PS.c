@@ -1,16 +1,16 @@
 #include "ProcUtil.h"
 
-void PSSort(PROCESS Proc[], SIMULATION Sim);
-int PS(PROCESS Proc[], SIMULATION Sim);
+void PSSort(PROCESS Proc[], SIMULATION *Sim);
+int PS(PROCESS Proc[], SIMULATION *Sim);
 
 
-void PSSort(PROCESS Proc[], SIMULATION Sim)
+void PSSort(PROCESS Proc[], SIMULATION *Sim)
 {
     int i,j;
 
-    for(i=0; i < Sim.TotalProc; i++)
+    for(i=0; i < Sim->TotalProc; i++)
     {
-        for(j=0; j< Sim.TotalProc-1; j++)
+        for(j=0; j< Sim->TotalProc-1; j++)
         {
             if(Proc[j].PRIORITY > Proc[j+1].PRIORITY)
             {
@@ -22,12 +22,13 @@ void PSSort(PROCESS Proc[], SIMULATION Sim)
     }
 }
 
-int PS(PROCESS Proc[], SIMULATION Sim)
+int PS(PROCESS Proc[], SIMULATION *Sim)
 {
     printf("[Debug]: Sorted list\n");
     PSSort(Proc,Sim);
     ListProcess(Proc,Sim);
     printf("[Debug]: Finished Sorting\n");
+    printf("/***********  Priority-Scheduling Algorithm ***********/\n");
 
     int pos = 0;
     int Time = 0;

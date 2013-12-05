@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
     int Select;
     bool INTERACTIVE = false;
     bool test = false;
-    SIMULATION SIMINFO;
+    SIMULATION* SIMINFO;
     FILE *DATA;
     if(argc !=4)
     {
@@ -23,21 +23,27 @@ int main(int argc, char *argv[])
     }
 
 //setup the Data
-    SIMINFO.IOProc = 0;
-    SIMINFO.RQProc = 0;
-    SIMINFO.Time = 0;
-    SIMINFO.TotalProc = atoi(argv[2]);
-    SIMINFO.TimeInterval = atoi(argv[3]);
-    SIMINFO.Schedule = "PS";
+    SIMINFO= (SIMULATION*) malloc (sizeof (SIMULATION));
+    SIMINFO->IOProc = 0;
+    SIMINFO->RQProc = 0;
+    SIMINFO->Time = 0;
+    SIMINFO->CPU_Idle = 0;
+    SIMINFO->ProcFinished = false;
+    SIMINFO->TotalProc = atoi(argv[2]);
+    SIMINFO->TimeInterval = atoi(argv[3]);
+    //SIMINFO.Schedule = "PS";
 
-    PROCESS Proc[SIMINFO.TotalProc];
-    InputFromFile(Proc,DATA);
+    PROCESS Proc[SIMINFO->TotalProc];
+    SIMINFO->RQProc = InputFromFile(Proc,DATA);
+    SIMINFO->IOProc = 0;
     ListProcess(Proc,SIMINFO);
 
 //just runs the Priority Sort algorithm
-    PS(Proc,SIMINFO);
-    printf("[DEBUG]: outputing test\n");
-    SnapShot(Proc, SIMINFO);
+    //PS(Proc,SIMINFO);
+    //printf("[DEBUG]: outputing test\n");
+    //SnapShot(Proc, SIMINFO);
+
+    SJF(Proc, SIMINFO);
 
     if(test == true)
     {

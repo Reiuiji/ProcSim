@@ -1,5 +1,5 @@
-#ifndef MY_HEADER_H
-#define MY_HEADER_H
+#ifndef PROCUTIL//prevent this from being called multiple times
+#define PROCUTIL
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -15,6 +15,8 @@ typedef struct Process
     int WaitTime;//waiting time
     int FinishTime;//time when process finish
     int CPU_WITH_IO;//half the CPU time for IO executing hald way of the CPU Burst.
+    int CPU_Duration;//how long the process in the CPU
+    int IO_Duration;//how long the process in the IO
     bool Complete;//yay process is complete
     bool InCPU;//indicate that the Process is in the CPU
     bool InIO;//indicates that the Process is in the IO
@@ -28,12 +30,19 @@ typedef struct SimulationInfo
     int TimeInterval;//snapshot time
     int Time;//simulate time
     int TotalProc;//total Prcesses in the simulation
+    int CPU_Current;//Current Process in service by the CPU
+    int IO_Current;//Current Process in Service by the IO
     int RQProc; //number of Processes in the ready Queue
     int IOProc; //number of Processes in the IO Queue
+    char ** Schedule; //what is the name of the Schedule Algorithm
 
 } SIMULATION;
 
 //functions
+
+int NextQueue(PROCESS Proc[], SIMULATION SIM);
+int NextIO(PROCESS Proc[], SIMULATION SIM);
+
 int InputFromFile(PROCESS Proc[], FILE *InputFile);
 void ListProcess (PROCESS Proc[],SIMULATION SIM);
 void SnapShot(PROCESS Proc[], SIMULATION SIM);//, char **);
@@ -44,4 +53,4 @@ void DisplayDeviceQueue(PROCESS Proc[],SIMULATION SIM);
 int Array_test(FILE* INPUT,SIMULATION SIM);
 
 
-#endif MY_HEADER_H
+#endif PROCUTIL

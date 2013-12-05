@@ -28,6 +28,7 @@ int main(int argc, char *argv[])
     SIMINFO.Time = 0;
     SIMINFO.TotalProc = atoi(argv[2]);
     SIMINFO.TimeInterval = atoi(argv[3]);
+    SIMINFO.Schedule = "PS";
 
     PROCESS Proc[SIMINFO.TotalProc];
     InputFromFile(Proc,DATA);

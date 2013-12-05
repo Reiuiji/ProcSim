@@ -161,7 +161,9 @@ bool RunCPU(PROCESS Proc[], SIMULATION *SIM)//run based on the Current Ready Que
     if((Proc[Current].CPU_Duration >= Proc[Current].CPU_WITH_IO) && (Proc[Current].IO_BURST > Proc[Current].IO_Duration))
     {
         Proc[Current].DeviceQueue = true; //Added to the Device Queue
+        SIM->IOProc++;
         Proc[Current].ReadyQueue = false; //removed from the readyQueue
+        SIM->RQProc--;
         Proc[Current].InCPU = false;
 
         if(SIM->Time%SIM->TimeInterval == 0)
@@ -257,12 +259,13 @@ bool RunIO(PROCESS Proc[], SIMULATION *SIM)//run based on the Current IO
     int pos;
     int Current = -1;//-1 acts as a error if the next for cant find the process
 
+
     if(SIM->Time == 0)//indicates start of simulation
     {
         DisplayDeviceQueue(Proc, SIM);
     }
 
-    if(SIM->RQProc > 0 && SIM->IO_Current == -1)
+    if(SIM->IOProc > 0 && SIM->IO_Current == -1)
     {
         SIM->IO_Current = NextIO(Proc, SIM);
     }
@@ -287,11 +290,17 @@ bool RunIO(PROCESS Proc[], SIMULATION *SIM)//run based on the Current IO
         return false;
     }
 
+
+    //Does all what it needs for the Current Process
+    Proc[Current].IO_Duration++;
+
     // Checks the process data. If there's a program that has finished its IO burst but needs to finish its IO, it moves it to the device queue.
     if(Proc[Current].IO_Duration >= Proc[Current].IO_BURST)
     {
         Proc[Current].ReadyQueue = true; //Added to the Ready Queue
+        SIM->RQProc++;
         Proc[Current].DeviceQueue = false; //removed from the Device Queue
+        SIM->IOProc++;
         Proc[Current].InIO = false;
 
         if(SIM->Time%SIM->TimeInterval == 0)
@@ -308,8 +317,6 @@ bool RunIO(PROCESS Proc[], SIMULATION *SIM)//run based on the Current IO
         DisplayDeviceQueue(Proc, SIM);
     }
 
-    //Does all what it needs for the Current Process
-    Proc[Current].IO_Duration++;
 
     return true;
 }

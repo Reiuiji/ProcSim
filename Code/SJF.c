@@ -6,7 +6,7 @@ void IO_SJF(PROCESS Proc[], SIMULATION *Sim);
 
 int SJF(PROCESS Proc[], SIMULATION *Sim)
 {
-    bool DEBUG = false;
+    bool DEBUG = true;
     printf("/***********  Shortest-Job-First Algorithm ***********/\n");
     Sim->Schedule = "SJF";
     SJFSort(Proc, Sim);
@@ -27,11 +27,11 @@ int SJF(PROCESS Proc[], SIMULATION *Sim)
 
 
     int i;
-    for(i = 0; i<50; i++)
+    for(i = 0; i<15; i++)
     {
         RunCPU(Proc, Sim);
-        //IO_SJF(Proc, Sim);
-        //RunIO(Proc, Sim);
+        IO_SJF(Proc, Sim);
+        RunIO(Proc, Sim);
         Sim->Time++;
         if(DEBUG == true)
         {
@@ -43,7 +43,7 @@ int SJF(PROCESS Proc[], SIMULATION *Sim)
 
     }
 
-
+    return 0;
 }
 
 
@@ -99,15 +99,25 @@ void SJFSort(PROCESS Proc[], SIMULATION *Sim)
 //return the PID with the shortest job in the Device Queue
 void IO_SJF(PROCESS Proc[], SIMULATION *Sim)
 {
-    int i, Total = Sim->TotalProc;
-    int Current = NextIO(Proc, Sim);
-    for(i=0; i < Total-1; i++)
+    int pos, Current, Total = Sim->TotalProc;
+
+    if((Sim->IO_Current == -1) || (Proc[IOPIDtoPOS(Proc, Sim)].DeviceQueue == false))
     {
-        if(Proc[Current].IO_BURST > Proc[i].IO_BURST)
-        {
-            Current = i;
-        }
+        Sim->IO_Current = NextIO(Proc, Sim);
     }
-    Sim->IO_Current = Current;
+    Current = IOPIDtoPOS(Proc, Sim);
+
+    for(pos=0; pos < Total; pos++)
+    {
+        if((Proc[pos].DeviceQueue == true))
+        {
+            if((Proc[Sim->IO_Current].IO_BURST-Proc[Sim->IO_Current].IO_Duration) > (Proc[pos].IO_BURST-Proc[pos].IO_Duration))
+            {
+                Sim->IO_Current = Proc[pos].P_ID;
+            }
+        }
+
+    }
+
 }
 

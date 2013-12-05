@@ -30,8 +30,6 @@ int PS(PROCESS Proc[], SIMULATION *Sim)
     printf("[Debug]: Finished Sorting\n");
     printf("/***********  Priority-Scheduling Algorithm ***********/\n");
 
-    int pos = 0;
-    int Time = 0;
 //    while(Sim.TotalProc > 0)
 //    {
 //

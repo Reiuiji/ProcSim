@@ -2,6 +2,7 @@
 
 void SJFSort(PROCESS Proc[], SIMULATION *Sim);
 int SJF(PROCESS Proc[], SIMULATION *Sim);
+void IO_SJF(PROCESS Proc[], SIMULATION *Sim);
 
 int SJF(PROCESS Proc[], SIMULATION *Sim)
 {
@@ -10,7 +11,7 @@ int SJF(PROCESS Proc[], SIMULATION *Sim)
     Sim->Schedule = "SJF";
     SJFSort(Proc, Sim);
 //    printf("[+DEBUG+]\n");
-//    ListProcess(Proc, Sim);
+    //ListProcess(Proc, Sim);
 //    printf("[-DEBUG-]\n");
 
     //setup ready current and IO current
@@ -22,22 +23,24 @@ int SJF(PROCESS Proc[], SIMULATION *Sim)
         ListProcess(Proc, Sim);
         ListSim(Sim);
     }
-    SnapShot(Proc, Sim);
+    //SnapShot(Proc, Sim);
 
 
     int i;
-    for(i = 0; i<20; i++)
+    for(i = 0; i<50; i++)
     {
         RunCPU(Proc, Sim);
-        RunIO(Proc, Sim);
+        //IO_SJF(Proc, Sim);
+        //RunIO(Proc, Sim);
         Sim->Time++;
         if(DEBUG == true)
         {
             ListProcess(Proc, Sim);
             ListSim(Sim);
         }
-        SnapShot(Proc, Sim);
+        //SnapShot(Proc, Sim);
         SJFSort(Proc, Sim);
+
     }
 
 
@@ -92,3 +95,19 @@ void SJFSort(PROCESS Proc[], SIMULATION *Sim)
         }
     }
 }
+
+//return the PID with the shortest job in the Device Queue
+void IO_SJF(PROCESS Proc[], SIMULATION *Sim)
+{
+    int i, Total = Sim->TotalProc;
+    int Current = NextIO(Proc, Sim);
+    for(i=0; i < Total-1; i++)
+    {
+        if(Proc[Current].IO_BURST > Proc[i].IO_BURST)
+        {
+            Current = i;
+        }
+    }
+    Sim->IO_Current = Current;
+}
+

@@ -46,6 +46,8 @@ typedef struct SimulationInfo
 int NextQueue(PROCESS Proc[], SIMULATION *SIM);
 int NextIO(PROCESS Proc[], SIMULATION *SIM);
 int PIDtoPOS(PROCESS Proc[],SIMULATION *SIM);
+int CPUPIDtoPOS(PROCESS Proc[],SIMULATION *SIM);
+int IOPIDtoPOS(PROCESS Proc[],SIMULATION *SIM);
 
 bool RunCPU(PROCESS Proc[], SIMULATION *SIM);
 bool RunIO(PROCESS Proc[], SIMULATION *SIM);

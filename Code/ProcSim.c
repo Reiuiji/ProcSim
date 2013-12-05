@@ -28,7 +28,6 @@ int main(int argc, char *argv[])
     SIMINFO->RQProc = 0;
     SIMINFO->Time = 0;
     SIMINFO->CPU_Idle = 0;
-    SIMINFO->ProcFinished = false;
     SIMINFO->TotalProc = atoi(argv[2]);
     SIMINFO->TimeInterval = atoi(argv[3]);
     //SIMINFO.Schedule = "PS";
@@ -36,7 +35,7 @@ int main(int argc, char *argv[])
     PROCESS Proc[SIMINFO->TotalProc];
     SIMINFO->RQProc = InputFromFile(Proc,DATA);
     SIMINFO->IOProc = 0;
-    ListProcess(Proc,SIMINFO);
+    //ListProcess(Proc,SIMINFO);
 
 //just runs the Priority Sort algorithm
     //PS(Proc,SIMINFO);

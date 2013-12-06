@@ -28,6 +28,7 @@ int main(int argc, char *argv[])
     SIMINFO->RQProc = 0;
     SIMINFO->Time = 0;
     SIMINFO->CPU_Idle = 0;
+    SIMINFO->IOJFinished = -1;//indicate no jobs finished
     SIMINFO->TotalProc = atoi(argv[2]);
     SIMINFO->TimeInterval = atoi(argv[3]);
     //SIMINFO.Schedule = "PS";

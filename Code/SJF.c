@@ -24,7 +24,7 @@ int SJF(PROCESS Proc[], SIMULATION *Sim)
         ListSim(Sim);
     }
     //SnapShot(Proc, Sim);
-
+//
         CheckCPU(Proc, Sim);
         CheckIO(Proc, Sim);
 
@@ -50,6 +50,8 @@ int SJF(PROCESS Proc[], SIMULATION *Sim)
         //SnapShot(Proc, Sim);
 
     }
+                ListProcess(Proc, Sim);
+            ListSim(Sim);
 
     return 0;
 }

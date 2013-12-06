@@ -135,6 +135,10 @@ bool CheckIO(PROCESS Proc[], SIMULATION *SIM)
             {
                 Proc[pos].ReadyQueue = true;
                 Proc[pos].DeviceQueue = false;
+                if(SIM->IOJFinished == -1)
+                {
+                    SIM->IOJFinished = Proc[pos].P_ID;
+                }
             }
         }
     }
@@ -175,7 +179,7 @@ bool RunCPU(PROCESS Proc[], SIMULATION *SIM)//run based on the Current Ready Que
     //increment the WaitTime for Process not in CPU
     for( pos=0; pos<SIM->TotalProc; pos++)
     {
-        if(pos!= Current)
+        if((pos!= Current) && (Proc[pos].Complete == false))
         {
             Proc[pos].WaitTime++;
             //Process still have not response
@@ -339,22 +343,17 @@ bool RunIO(PROCESS Proc[], SIMULATION *SIM)//run based on the Current IO
     {
         if(Proc[pos].DeviceQueue == true) //search to find which Process it is serving
         {
-            //Proc[pos].InIO == true;//indicates it is in the IO
-            if(Proc[pos].IO_Duration >= Proc[pos].IO_BURST)
-            {
-                Proc[pos].ReadyQueue = true; //Added to the Ready Queue
-                SIM->RQProc++;
-                Proc[pos].DeviceQueue = false; //removed from the Device Queue
-                SIM->IOProc++;
-
-                if(SIM->Time%SIM->TimeInterval == 0)
-                {
-                    printf("JOB %i finished IO burst\n",Proc[pos].P_ID);
-                }
-
-                //SIM->CPU_Current = NextIO(Proc, SIM);//grabs the next on the queue
-
-            }
+//            //Proc[pos].InIO == true;//indicates it is in the IO
+//            if(Proc[pos].IO_Duration >= Proc[pos].IO_BURST)
+//            {
+//                Proc[pos].ReadyQueue = true; //Added to the Ready Queue
+//                SIM->RQProc++;
+//                Proc[pos].DeviceQueue = false; //removed from the Device Queue
+//                SIM->IOProc--;
+//
+//                //SIM->CPU_Current = NextIO(Proc, SIM);//grabs the next on the queue
+//
+//            }
             Proc[pos].IO_Duration++;//increment the duation in the IO
         }
     }
@@ -373,16 +372,37 @@ bool RunIO(PROCESS Proc[], SIMULATION *SIM)//run based on the Current IO
 
     if(SIM->Time%SIM->TimeInterval == 0)
     {
+        if(SIM->IOJFinished != -1)
+        {
+            int pos;
+            for( pos=0; pos<SIM->TotalProc; pos++)//check each Process to see
+            {
+                if(Proc[pos].P_ID == SIM->IOJFinished) //search to find which Process it is serving
+                {
+                    break;
+                }
+            }
+
+            printf("JOB %i finished I/O burst\n",Proc[pos].P_ID);
+
+            SIM->IOJFinished = -1;
+        }
         DisplayDeviceQueue(Proc, SIM);
     }
-
+    else
+    {
+        if(SIM->IOJFinished != -1)
+        {
+            SIM->IOJFinished = -1;
+        }
+    }
 
     return true;
 }
 
 bool IsProcComplete(PROCESS Proc[], SIMULATION *SIM)
 {
-int pos;
+    int pos;
     for( pos=0; pos<SIM->TotalProc; pos++)
     {
         if(Proc[pos].Complete == false)

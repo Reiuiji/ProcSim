@@ -63,7 +63,7 @@ void FCFSSort(PROCESS Proc[], SIMULATION *Sim)
         for(j=0; j < Total-1; j++)
         {
 
-            if((Proc[j].P_ID>Proc[j+1].P_ID))
+            if((Proc[j].P_ID>Proc[j+1].P_ID)&&(Proc[j+1].IO_BURST >= 1))
             {
 
                     PROCESS tmp = Proc[j];

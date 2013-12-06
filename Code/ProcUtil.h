@@ -38,6 +38,7 @@ typedef struct SimulationInfo
     int CPUJFinished; //[PID]signal to indicate that a process finished its job in the CPU
     int IOJFinished;//[PID] signal to indicate that a IO job is finished
     char ** Schedule; //what is the name of the Schedule Algorithm
+    char SeqOfProc[]; //the sequency of the processes in the cpu
 
 } SIMULATION;
 
@@ -68,6 +69,13 @@ void DisplayReadyQueue(PROCESS Proc[],SIMULATION *SIM);
 void DisplayDeviceQueue(PROCESS Proc[],SIMULATION *SIM);
 
 int Array_test(FILE* INPUT,SIMULATION *SIM);
+
+//Stat Functions
+void FinalReport(PROCESS Proc[],SIMULATION *SIM);
+
+void SeqAdd(SIMULATION *SIM);
+void SortPID(PROCESS Proc[],SIMULATION *SIM);
+
 
 
 #endif PROCUTIL

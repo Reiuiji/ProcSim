@@ -25,8 +25,8 @@ int SJF(PROCESS Proc[], SIMULATION *Sim)
     }
     //SnapShot(Proc, Sim);
 //
-        CheckCPU(Proc, Sim);
-        CheckIO(Proc, Sim);
+    CheckCPU(Proc, Sim);
+    CheckIO(Proc, Sim);
 
     int i;
     while(IsProcComplete(Proc, Sim))
@@ -50,8 +50,18 @@ int SJF(PROCESS Proc[], SIMULATION *Sim)
         //SnapShot(Proc, Sim);
 
     }
-                ListProcess(Proc, Sim);
-            ListSim(Sim);
+    //Set the last proc Response time
+    current = CPUPIDtoPOS(Proc, Sim);
+    Proc[current].TurnAroundTime = Sim->Time;
+    Sim->CPU_Current = -1; //NO More process it needs to work on
+
+    ListProcess(Proc, Sim);
+    ListSim(Sim);
+
+    FinalReport(Proc, Sim);
+
+
+
 
     return 0;
 }

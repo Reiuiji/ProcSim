@@ -1,6 +1,7 @@
 #include "ProcUtil.h"
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
 
 
 
@@ -182,13 +183,10 @@ bool RunCPU(PROCESS Proc[], SIMULATION *SIM)//run based on the Current Ready Que
         if((pos!= Current) && (Proc[pos].Complete == false))
         {
             Proc[pos].WaitTime++;
-            //Process still have not response
-            if(Proc[pos].CPU_Duration == 0)
-            {
-                Proc[pos].ResponseTime++;
-            }
         }
     }
+
+
 
     //output the time line for the snapshot
     if(SIM->Time%SIM->TimeInterval == 0)
@@ -205,8 +203,15 @@ bool RunCPU(PROCESS Proc[], SIMULATION *SIM)//run based on the Current Ready Que
             {
                 CPUBurstI = Proc[Current].CPU_BURST;
             }
+            SeqAdd(SIM);
             printf("CPU loading job %i : CPU burst (%i) IO burst (%i) \n",Proc[Current].P_ID, CPUBurstI, Proc[Current].IO_BURST - Proc[Current].IO_Duration);
         }
+    }
+
+    // Checks the process data if this is it first time in the CPU
+    if(Proc[Current].CPU_Duration == 1)
+    {
+        Proc[Current].ResponseTime = SIM->Time;
     }
 
 
@@ -239,6 +244,7 @@ bool RunCPU(PROCESS Proc[], SIMULATION *SIM)//run based on the Current Ready Que
             {
                 CPUBurst = Proc[Current].CPU_BURST;
             }
+            SeqAdd(SIM);
             printf("CPU loading job %i: CPU burst(%i) IO burst(%i)\n",Proc[Current].P_ID, CPUBurst-Proc[Current].CPU_Duration, Proc[Current].IO_BURST-Proc[Current].IO_Duration);
         }
 
@@ -272,6 +278,7 @@ bool RunCPU(PROCESS Proc[], SIMULATION *SIM)//run based on the Current Ready Que
             {
                 CPUBurst = Proc[Current].CPU_BURST;
             }
+            SeqAdd(SIM);
             printf("CPU loading job %i: CPU burst(%i) IO burst(%i)\n",Proc[Current].P_ID, CPUBurst-Proc[Current].CPU_Duration, Proc[Current].IO_BURST-Proc[Current].IO_Duration);
         }
 
@@ -596,3 +603,74 @@ int Array_test(FILE* INPUT,SIMULATION *SIM)
     return 0;
 }
 
+void SeqAdd(SIMULATION *SIM)
+{
+    char TMP[5];
+    int CPU_ID = SIM->CPU_Current;
+    if(SIM->SeqOfProc[0] == '\0')
+        sprintf(TMP,"%i",CPU_ID);
+    else
+        sprintf(TMP,"-%i",CPU_ID);
+
+    strcat(SIM->SeqOfProc,TMP);
+}
+
+void FinalReport(PROCESS Proc[],SIMULATION *SIM)
+{
+    printf("\nFinal report for %s algorithm.\n\n",SIM->Schedule);
+
+    //calculate throughput (total num of proc / time)
+    double throughput = SIM->TotalProc/(double)SIM->Time;
+    printf("THROUGHPUT = %.8g\n\n",throughput);
+
+    //Process the wait time and add the total time
+    double TotalTimeWaited = 0;
+    int pos;
+
+    //Sort the Array by PID
+    SortPID(Proc, SIM);
+
+    printf("Process ID Wait Time\n");
+
+    for(pos = 0; pos < SIM->TotalProc; pos++)
+    {
+        printf("%-5i     	 %-5i\n",Proc[pos].P_ID, Proc[pos].ResponseTime);
+        TotalTimeWaited+= Proc[pos].ResponseTime;
+    }
+    printf("AVERAGE WAITING TIME = %g\n\n", TotalTimeWaited/(double)pos);
+
+    printf("CPU UTILIZATION = %g\%\n\n",((SIM->Time-SIM->CPU_Idle)/(double)SIM->Time)*100);
+
+    printf("SEQUENCE OF PROCESSES IN CPU: %s\n\n", SIM->SeqOfProc);
+
+    //Process the turnaroundtime
+    double TurnAroundTime = 0;
+    printf("Process ID  Turnaround Time\n");
+    for(pos = 0; pos < SIM->TotalProc; pos++)
+    {
+        printf("%-5i     	 %-5i\n",Proc[pos].P_ID, Proc[pos].TurnAroundTime);
+        TurnAroundTime=TurnAroundTime + Proc[pos].TurnAroundTime;
+    }
+    printf("AVERAGE TURNAROUND TIME = %g\n", TurnAroundTime/(double)SIM->TotalProc);
+
+}
+
+void SortPID(PROCESS Proc[],SIMULATION *SIM)
+{
+    int i, j, Total = SIM->TotalProc;
+
+    for(i=0; i < Total; i++)
+    {
+        for(j=0; j < Total-1; j++)
+        {
+
+            if(Proc[j].P_ID > Proc[j+1].P_ID)
+            {
+                PROCESS tmp = Proc[j];
+                Proc[j] = Proc[j+1];
+                Proc[j+1] = tmp;
+            }
+        }
+    }
+
+}

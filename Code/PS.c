@@ -3,6 +3,40 @@
 void PSSort(PROCESS Proc[], SIMULATION *Sim);
 int PS(PROCESS Proc[], SIMULATION *Sim);
 
+int PS(PROCESS Proc[], SIMULATION *Sim)
+{
+    printf("/***********  Priority-Scheduling Algorithm ***********/\n");
+
+    Sim->Schedule = "PS";
+
+    PSSort(Proc, Sim);
+
+    //setup ready/IO current
+    Sim->CPU_Current = Proc[0].P_ID;
+    Sim->IO_Current = -1;
+
+    CheckCPU(Proc, Sim);
+    CheckIO(Proc, Sim);
+
+    while(IsProcComplete(Proc, Sim))
+    {
+        PSSort(Proc, Sim);
+
+        RunCPU(Proc, Sim);
+        RunIO(Proc, Sim);
+        Sim->Time++;
+
+        CheckCPU(Proc, Sim);
+        CheckIO(Proc, Sim);
+    }
+    Proc[CPUPIDtoPOS(Proc, Sim)].TurnAroundTime = Sim->Time;
+    Sim->CPU_Current = -1;
+
+    FinalReport(Proc, Sim);
+
+    return 0;
+
+}
 
 void PSSort(PROCESS Proc[], SIMULATION *Sim)
 {
@@ -20,25 +54,4 @@ void PSSort(PROCESS Proc[], SIMULATION *Sim)
             }
         }
     }
-}
-
-int PS(PROCESS Proc[], SIMULATION *Sim)
-{
-    printf("[Debug]: Sorted list\n");
-    PSSort(Proc,Sim);
-    ListProcess(Proc,Sim);
-    printf("[Debug]: Finished Sorting\n");
-    printf("/***********  Priority-Scheduling Algorithm ***********/\n");
-
-//    while(Sim.TotalProc > 0)
-//    {
-//
-//
-//        //void SnapShot(Proc, Sim, "PS");
-//        //TOTAL--;//one less process
-//        pos++;//next on the list
-//    }
-
-    return 0;
-
 }

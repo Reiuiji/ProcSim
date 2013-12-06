@@ -54,6 +54,7 @@ int CPUPIDtoPOS(PROCESS Proc[],SIMULATION *SIM);
 bool CheckCPU(PROCESS Proc[], SIMULATION *SIM);
 bool CheckIO(PROCESS Proc[], SIMULATION *SIM);
 
+void PreemptiveCheck(PROCESS Proc[], SIMULATION *SIM);
 
 bool RunCPU(PROCESS Proc[], SIMULATION *SIM);
 bool RunIO(PROCESS Proc[], SIMULATION *SIM);

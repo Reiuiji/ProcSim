@@ -145,6 +145,76 @@ bool CheckIO(PROCESS Proc[], SIMULATION *SIM)
 }
 
 
+void PreemptiveCheck(PROCESS Proc[], SIMULATION *SIM)
+{
+	/* Note that the reason that this checks against
+	the first process in the queue is because it
+	is supposedly the first thing in the queue, meaning it has
+	the smallest burst time. */
+
+
+	/* There needs to be something here that says if the queue isn't empty then you can do this but if it's not empty then do not do it */
+    if((Proc[0].CPU_BURST != 0) && (Proc[SIM->CPU_Current].CPU_BURST > 0))
+    {
+	// If the CPU-loaded process has an IO burst left and the other process has an IO burst left, it uses the half burst times.
+	if((Proc[SIM->CPU_Current].IO_BURST >= 1) && (Proc[0].IO_BURST >= 1))
+	{
+		if(((Proc[SIM->CPU_Current].CPU_BURST/2) - Proc[SIM->CPU_Current].CPU_Duration) > ((Proc[(0)].CPU_BURST/2) - Proc[(0)].CPU_Duration))
+		{
+			// If the CPU-loaded process's burst length is greater, they switch spots.
+			Proc[SIM->CPU_Current].InCPU = false;
+			Proc[SIM->CPU_Current].ReadyQueue = true;
+
+			Proc[0].InCPU = true;
+			Proc[0].ReadyQueue = false;
+		}
+	}
+
+	// If the CPU-loaded process has an IO burst left, but the other process doesn't, the cpu-loaded uses half burst and the other uses full.
+	else if((Proc[SIM->CPU_Current].IO_BURST >= 1) && (Proc[0].IO_BURST == 0))
+	{
+		if(((Proc[SIM->CPU_Current].CPU_BURST/2) - Proc[SIM->CPU_Current].CPU_Duration) > ((Proc[(0)].CPU_BURST) - Proc[(0)].CPU_Duration))
+		{
+			// If the CPU-loaded process's burst length is greater, they switch spots.
+			Proc[SIM->CPU_Current].InCPU = false;
+			Proc[SIM->CPU_Current].ReadyQueue = true;
+
+			Proc[0].InCPU = true;
+			Proc[0].ReadyQueue = false;
+		}
+	}
+
+	// If the CPU-loaded process has no IO burst left, but the other process does, the cpu-loaded uses full burst and the other uses half.
+	else if((Proc[SIM->CPU_Current].IO_BURST == 0) && (Proc[0].IO_BURST >= 1))
+	{
+		if(((Proc[SIM->CPU_Current].CPU_BURST) - Proc[SIM->CPU_Current].CPU_Duration) > ((Proc[(0)].CPU_BURST/2) - Proc[(0)].CPU_Duration))
+		{
+			// If the CPU-loaded process's burst length is greater, they switch spots.
+			Proc[SIM->CPU_Current].InCPU = false;
+			Proc[SIM->CPU_Current].ReadyQueue = true;
+
+			Proc[0].InCPU = true;
+			Proc[0].ReadyQueue = false;
+		}
+	}
+
+
+	// If the CPU-loaded process has no IO burst left and the other process has no IO burst left, they use full burst times.
+	else if((Proc[SIM->CPU_Current].IO_BURST == 0) && (Proc[0].IO_BURST == 0))
+	{
+		if(((Proc[SIM->CPU_Current].CPU_BURST) - Proc[SIM->CPU_Current].CPU_Duration) > ((Proc[(0)].CPU_BURST) - Proc[(0)].CPU_Duration))
+		{
+			// If the CPU-loaded process's burst length is greater, they switch spots.
+			Proc[SIM->CPU_Current].InCPU = false;
+			Proc[SIM->CPU_Current].ReadyQueue = true;
+
+			Proc[0].InCPU = true;
+			Proc[0].ReadyQueue = false;
+		}
+	}
+    }
+}
+
 bool RunCPU(PROCESS Proc[], SIMULATION *SIM)//run based on the Current Ready Que
 {
     int pos;

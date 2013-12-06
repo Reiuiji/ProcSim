@@ -43,6 +43,7 @@ typedef struct SimulationInfo
 
 //functions
 
+bool IsProcComplete(PROCESS Proc[], SIMULATION *SIM);
 int NextQueue(PROCESS Proc[], SIMULATION *SIM);
 //int NextIO(PROCESS Proc[], SIMULATION *SIM);
 int PIDtoPOS(PROCESS Proc[],SIMULATION *SIM);

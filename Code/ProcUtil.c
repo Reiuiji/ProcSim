@@ -380,6 +380,20 @@ bool RunIO(PROCESS Proc[], SIMULATION *SIM)//run based on the Current IO
     return true;
 }
 
+bool IsProcComplete(PROCESS Proc[], SIMULATION *SIM)
+{
+int pos;
+    for( pos=0; pos<SIM->TotalProc; pos++)
+    {
+        if(Proc[pos].Complete == false)
+        {
+            return true;
+        }
+
+    }
+    return false;
+}
+
 int NextQueue(PROCESS Proc[], SIMULATION *SIM)
 {
     int pos;

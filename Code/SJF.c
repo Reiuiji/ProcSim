@@ -25,12 +25,13 @@ int SJF(PROCESS Proc[], SIMULATION *Sim)
     }
     //SnapShot(Proc, Sim);
 
-
-    int i;
-    for(i = 0; i<82; i++)
-    {
         CheckCPU(Proc, Sim);
         CheckIO(Proc, Sim);
+
+    int i;
+    while(IsProcComplete(Proc, Sim))
+    {
+
 
         SJFSort(Proc, Sim);
 
@@ -43,6 +44,9 @@ int SJF(PROCESS Proc[], SIMULATION *Sim)
             ListProcess(Proc, Sim);
             ListSim(Sim);
         }
+
+        CheckCPU(Proc, Sim);
+        CheckIO(Proc, Sim);
         //SnapShot(Proc, Sim);
 
     }

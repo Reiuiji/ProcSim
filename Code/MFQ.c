@@ -1,5 +1,5 @@
 //Get all 3 queues
-//Get arrival times 
+//Get arrival times
 //Get Burst Times
 //Measure Process Aging
 //Plan intervals to transfer processes
@@ -8,8 +8,8 @@
 struct queue1;
 struct queue2;
 struct queue3;
-void main(){
+void MFQ(){
 
 // Implementation of MFQ
-  
+
 }

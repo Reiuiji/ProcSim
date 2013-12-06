@@ -256,61 +256,60 @@ bool RunCPU(PROCESS Proc[], SIMULATION *SIM)//run based on the Current Ready Que
 
 bool RunIO(PROCESS Proc[], SIMULATION *SIM)//run based on the Current IO
 {
-    int pos;
-    int Current = -1;//-1 acts as a error if the next for cant find the process
+    int pos;//putting on the wizard hat
+    //int Current = -1;//-1 acts as a error if the next for cant find the process
 
 
-    if(SIM->Time == 0)//indicates start of simulation
+//    if(SIM->Time == 0)//indicates start of simulation
+//    {
+//        DisplayDeviceQueue(Proc, SIM);
+//    }
+
+//    if(SIM->IOProc > 0 && SIM->IO_Current == -1)
+//    {
+//        SIM->IO_Current = NextIO(Proc, SIM);
+//    }
+
+//    if(SIM->IO_Current == -1)//returns false since there is no more IO so it is finished
+//    {
+//        return false;
+//    }
+
+    for( pos=0; pos<SIM->TotalProc; pos++)//check to see what process is in the IO Queue
     {
-        DisplayDeviceQueue(Proc, SIM);
-    }
-
-    if(SIM->IOProc > 0 && SIM->IO_Current == -1)
-    {
-        SIM->IO_Current = NextIO(Proc, SIM);
-    }
-
-    if(SIM->IO_Current == -1)//returns false since there is no more IO so it is finished
-    {
-        return false;
-    }
-
-    for( pos=0; pos<SIM->TotalProc; pos++)//check each Process to see
-    {
-        if(Proc[pos].P_ID == SIM->IO_Current) //search to find which Process it is serving
+        if(Proc[pos].DeviceQueue == true) //search to find which Process it is serving
         {
-            Current = pos;
-            Proc[Current].InIO == true;//indicates it is in the IO
-            break; //found the next process to work on
+            //Proc[pos].InIO == true;//indicates it is in the IO
+            if(Proc[pos].IO_Duration >= Proc[pos].IO_BURST)
+            {
+                Proc[pos].ReadyQueue = true; //Added to the Ready Queue
+                SIM->RQProc++;
+                Proc[pos].DeviceQueue = false; //removed from the Device Queue
+                SIM->IOProc++;
+
+                if(SIM->Time%SIM->TimeInterval == 0)
+                {
+                    printf("JOB %i finished IO burst\n",Proc[pos].P_ID);
+                }
+
+                //SIM->CPU_Current = NextIO(Proc, SIM);//grabs the next on the queue
+
+            }
+            Proc[pos].IO_Duration++;//increment the duation in the IO
         }
     }
-
-    if(Current == -1)//returns false: cant Find the current Process in the queue
-    {
-        return false;
-    }
+//
+//    if(Current == -1)//returns false: cant Find the current Process in the queue
+//    {
+//        return false;
+//    }
 
 
     //Does all what it needs for the Current Process
-    Proc[Current].IO_Duration++;
+    //Proc[Current].IO_Duration++;
 
     // Checks the process data. If there's a program that has finished its IO burst but needs to finish its IO, it moves it to the device queue.
-    if(Proc[Current].IO_Duration >= Proc[Current].IO_BURST)
-    {
-        Proc[Current].ReadyQueue = true; //Added to the Ready Queue
-        SIM->RQProc++;
-        Proc[Current].DeviceQueue = false; //removed from the Device Queue
-        SIM->IOProc++;
-        Proc[Current].InIO = false;
 
-        if(SIM->Time%SIM->TimeInterval == 0)
-        {
-            printf("JOB %i finished IO burst\n",Proc[Current].P_ID);
-        }
-
-        SIM->CPU_Current = NextIO(Proc, SIM);//grabs the next on the queue
-
-    }
 
     if(SIM->Time%SIM->TimeInterval == 0)
     {
@@ -337,21 +336,21 @@ int NextQueue(PROCESS Proc[], SIMULATION *SIM)
     return -1;//means it checked and there is no queues left to run
 }
 
-int NextIO(PROCESS Proc[], SIMULATION *SIM)
-{
-    int i;
-    int Current = IOPIDtoPOS(Proc, SIM);
-
-    for(i=1/*next process*/; i<SIM->TotalProc-1; i++) //checks the rest of the process
-    {
-        if(Proc[(i+Current)%SIM->TotalProc].DeviceQueue == true) //checks the next proc on the list to see if it needs to be in the Que
-        {
-            return Proc[(i+Current)%SIM->TotalProc].P_ID;
-        }
-    }
-
-    return -1;//means it checked and there is no queues left to run
-}
+//int NextIO(PROCESS Proc[], SIMULATION *SIM)
+//{
+//    int i;
+//    int Current = IOPIDtoPOS(Proc, SIM);
+//
+//    for(i=1/*next process*/; i<SIM->TotalProc-1; i++) //checks the rest of the process
+//    {
+//        if(Proc[(i+Current)%SIM->TotalProc].DeviceQueue == true) //checks the next proc on the list to see if it needs to be in the Que
+//        {
+//            return Proc[(i+Current)%SIM->TotalProc].P_ID;
+//        }
+//    }
+//
+//    return -1;//means it checked and there is no queues left to run
+//}
 
 int CPUPIDtoPOS(PROCESS Proc[],SIMULATION *SIM)//this will convert PID to the array position
 {
@@ -366,18 +365,18 @@ int CPUPIDtoPOS(PROCESS Proc[],SIMULATION *SIM)//this will convert PID to the ar
     return -1; //error cant find
 }
 
-int IOPIDtoPOS(PROCESS Proc[],SIMULATION *SIM)//this will convert PID to the array position
-{
-    int pos;
-    for( pos=0; pos<SIM->TotalProc; pos++)//check each Process to see
-    {
-        if(Proc[pos].P_ID == SIM->IO_Current) //search to find which Process it is serving
-        {
-            return pos;
-        }
-    }
-    return -1; //error cant find
-}
+//int IOPIDtoPOS(PROCESS Proc[],SIMULATION *SIM)//this will convert PID to the array position
+//{
+//    int pos;
+//    for( pos=0; pos<SIM->TotalProc; pos++)//check each Process to see
+//    {
+//        if(Proc[pos].P_ID == SIM->IO_Current) //search to find which Process it is serving
+//        {
+//            return pos;
+//        }
+//    }
+//    return -1; //error cant find
+//}
 
 void DisplayReadyQueue(PROCESS Proc[],SIMULATION *SIM)
 {

@@ -2,7 +2,7 @@
 
 void SJFSort(PROCESS Proc[], SIMULATION *Sim);
 int SJF(PROCESS Proc[], SIMULATION *Sim);
-void IO_SJF(PROCESS Proc[], SIMULATION *Sim);
+//void IO_SJF(PROCESS Proc[], SIMULATION *Sim);
 
 int SJF(PROCESS Proc[], SIMULATION *Sim)
 {
@@ -27,10 +27,10 @@ int SJF(PROCESS Proc[], SIMULATION *Sim)
 
 
     int i;
-    for(i = 0; i<15; i++)
+    for(i = 0; i<6; i++)
     {
+        //IO_SJF(Proc, Sim);
         RunCPU(Proc, Sim);
-        IO_SJF(Proc, Sim);
         RunIO(Proc, Sim);
         Sim->Time++;
         if(DEBUG == true)
@@ -97,27 +97,27 @@ void SJFSort(PROCESS Proc[], SIMULATION *Sim)
 }
 
 //return the PID with the shortest job in the Device Queue
-void IO_SJF(PROCESS Proc[], SIMULATION *Sim)
-{
-    int pos, Current, Total = Sim->TotalProc;
-
-    if((Sim->IO_Current == -1) || (Proc[IOPIDtoPOS(Proc, Sim)].DeviceQueue == false))
-    {
-        Sim->IO_Current = NextIO(Proc, Sim);
-    }
-    Current = IOPIDtoPOS(Proc, Sim);
-
-    for(pos=0; pos < Total; pos++)
-    {
-        if((Proc[pos].DeviceQueue == true))
-        {
-            if((Proc[Sim->IO_Current].IO_BURST-Proc[Sim->IO_Current].IO_Duration) > (Proc[pos].IO_BURST-Proc[pos].IO_Duration))
-            {
-                Sim->IO_Current = Proc[pos].P_ID;
-            }
-        }
-
-    }
-
-}
+//void IO_SJF(PROCESS Proc[], SIMULATION *Sim)
+//{
+//    int pos, Current, Total = Sim->TotalProc;
+//
+//    if((Sim->IO_Current == -1) || (Proc[IOPIDtoPOS(Proc, Sim)].DeviceQueue == false))
+//    {
+//        Sim->IO_Current = NextIO(Proc, Sim);
+//    }
+//    Current = IOPIDtoPOS(Proc, Sim);
+//
+//    for(pos=0; pos < Total; pos++)
+//    {
+//        if((Proc[pos].DeviceQueue == true))
+//        {
+//            if((Proc[Sim->IO_Current].IO_BURST-Proc[Sim->IO_Current].IO_Duration) > (Proc[pos].IO_BURST-Proc[pos].IO_Duration))
+//            {
+//                Sim->IO_Current = Proc[pos].P_ID;
+//            }
+//        }
+//
+//    }
+//
+//}
 

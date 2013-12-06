@@ -91,6 +91,55 @@ void ListSim(SIMULATION *SIM)
     printf("+----+----+-----------+--------+----------+------+------+---------+--------+\n");
 }
 
+bool CheckCPU(PROCESS Proc[], SIMULATION *SIM)
+{
+    int pos;
+    for(pos = 0 ; pos < SIM->TotalProc; pos++)
+    {
+        if((Proc[pos].CPU_BURST == Proc[pos].CPU_Duration) && (Proc[pos].Complete == false))//finished all the CPU time required
+        {
+            if(Proc[pos].IO_BURST == Proc[pos].IO_Duration)
+            {
+                Proc[pos].Complete = true;
+                Proc[pos].ReadyQueue = false;
+                Proc[pos].DeviceQueue = false;
+            }
+            else
+            {
+                Proc[pos].ReadyQueue = false;
+                Proc[pos].DeviceQueue = true;
+            }
+        }
+        else if((Proc[pos].CPU_BURST == Proc[pos].CPU_WITH_IO) && (Proc[pos].IO_BURST > 0))
+        {
+            Proc[pos].ReadyQueue = false;
+            Proc[pos].DeviceQueue = true;
+        }
+    }
+}
+
+bool CheckIO(PROCESS Proc[], SIMULATION *SIM)
+{
+    int pos;
+    for(pos = 0 ; pos < SIM->TotalProc; pos++)
+    {
+        if((Proc[pos].IO_BURST == Proc[pos].IO_Duration) && (Proc[pos].DeviceQueue == true))//finished all the IO time required
+        {
+            if(Proc[pos].CPU_BURST == Proc[pos].CPU_Duration)
+            {
+                Proc[pos].Complete = true;
+                Proc[pos].ReadyQueue = false;
+                Proc[pos].DeviceQueue = false;
+            }
+            else
+            {
+                Proc[pos].ReadyQueue = true;
+                Proc[pos].DeviceQueue = false;
+            }
+        }
+    }
+}
+
 
 bool RunCPU(PROCESS Proc[], SIMULATION *SIM)//run based on the Current Ready Que
 {
@@ -144,7 +193,7 @@ bool RunCPU(PROCESS Proc[], SIMULATION *SIM)//run based on the Current Ready Que
         if(SIM->Time == 0)//indicates start of simulation
         {
             int CPUBurstI;
-            if(Proc[Current].IO_BURST > 0)
+            if((Proc[Current].IO_Duration == 0) && (Proc[Current].IO_BURST > 0))
             {
                 CPUBurstI = Proc[Current].CPU_WITH_IO;
             }
@@ -152,7 +201,7 @@ bool RunCPU(PROCESS Proc[], SIMULATION *SIM)//run based on the Current Ready Que
             {
                 CPUBurstI = Proc[Current].CPU_BURST;
             }
-            printf("CPU loading job %i : CPU burst (%i) IO burst (%i) \n",Proc[Current].P_ID, CPUBurstI, Proc[Current].IO_BURST);
+            printf("CPU loading job %i : CPU burst (%i) IO burst (%i) \n",Proc[Current].P_ID, CPUBurstI, Proc[Current].IO_BURST - Proc[Current].IO_Duration);
         }
     }
 
@@ -178,7 +227,7 @@ bool RunCPU(PROCESS Proc[], SIMULATION *SIM)//run based on the Current Ready Que
         if(SIM->Time%SIM->TimeInterval == 0)
         {
             int CPUBurst;
-            if(Proc[Current].IO_BURST > 0)
+            if((Proc[Current].IO_Duration == 0) && (Proc[Current].IO_BURST > 0))
             {
                 CPUBurst = Proc[Current].CPU_WITH_IO;
             }
@@ -211,7 +260,7 @@ bool RunCPU(PROCESS Proc[], SIMULATION *SIM)//run based on the Current Ready Que
         if(SIM->Time%SIM->TimeInterval == 0)
         {
             int CPUBurst;
-            if(Proc[Current].IO_BURST > 0)
+            if((Proc[Current].IO_Duration == 0) && (Proc[Current].IO_BURST > 0))
             {
                 CPUBurst = Proc[Current].CPU_WITH_IO;
             }
@@ -228,7 +277,7 @@ bool RunCPU(PROCESS Proc[], SIMULATION *SIM)//run based on the Current Ready Que
         if((SIM->Time%SIM->TimeInterval == 0) && (SIM->Time != 0))
         {
             int CPUBurst;
-            if(Proc[Current].IO_BURST > 0)
+            if((Proc[Current].IO_Duration == 0) && (Proc[Current].IO_BURST > 0))
             {
                 CPUBurst = Proc[Current].CPU_WITH_IO;
             }
@@ -238,6 +287,17 @@ bool RunCPU(PROCESS Proc[], SIMULATION *SIM)//run based on the Current Ready Que
             }
 
             printf("Servicing %s job %i: CPU burst(%i) IO burst(%i)\n",SIM->Schedule, Proc[Current].P_ID, CPUBurst - Proc[Current].CPU_Duration, Proc[Current].IO_BURST - Proc[Current].IO_Duration );
+
+            if(SIM->Time%SIM->TimeInterval == 0)
+            {
+                Proc[Current].ReadyQueue = false;//quick and dirty way to make the display ready queue will not output the Process it is serving
+                DisplayReadyQueue(Proc, SIM);
+                Proc[Current].ReadyQueue = true;
+            }
+
+            Proc[Current].CPU_Duration++;
+            return true;
+
         }
     }
 
@@ -322,14 +382,23 @@ bool RunIO(PROCESS Proc[], SIMULATION *SIM)//run based on the Current IO
 
 int NextQueue(PROCESS Proc[], SIMULATION *SIM)
 {
-    int i;
-    int Current = CPUPIDtoPOS(Proc, SIM);
+    int pos;
+//    int i;
+//    int Current = CPUPIDtoPOS(Proc, SIM);
+//
+//    for(i=1/*next process*/; i<SIM->TotalProc-1; i++) //checks the rest of the process
+//    {
+//        if(Proc[(i+Current)%SIM->TotalProc].ReadyQueue == true) //checks the next proc on the list to see if it needs to be in the Que
+//        {
+//            return Proc[(i+Current)%SIM->TotalProc].P_ID; //return the PID
+//        }
+//    }
 
-    for(i=1/*next process*/; i<SIM->TotalProc-1; i++) //checks the rest of the process
+    for(pos = 0; pos < SIM->TotalProc; pos++)
     {
-        if(Proc[(i+Current)%SIM->TotalProc].ReadyQueue == true) //checks the next proc on the list to see if it needs to be in the Que
+        if(Proc[pos].ReadyQueue == true)
         {
-            return Proc[(i+Current)%SIM->TotalProc].P_ID; //return the PID
+            return Proc[pos].P_ID;
         }
     }
 

@@ -6,7 +6,7 @@ int SJF(PROCESS Proc[], SIMULATION *Sim);
 
 int SJF(PROCESS Proc[], SIMULATION *Sim)
 {
-    bool DEBUG = true;
+    bool DEBUG = false;
     printf("/***********  Shortest-Job-First Algorithm ***********/\n");
     Sim->Schedule = "SJF";
     SJFSort(Proc, Sim);
@@ -27,8 +27,13 @@ int SJF(PROCESS Proc[], SIMULATION *Sim)
 
 
     int i;
-    for(i = 0; i<6; i++)
+    for(i = 0; i<82; i++)
     {
+        CheckCPU(Proc, Sim);
+        CheckIO(Proc, Sim);
+
+        SJFSort(Proc, Sim);
+
         //IO_SJF(Proc, Sim);
         RunCPU(Proc, Sim);
         RunIO(Proc, Sim);
@@ -39,7 +44,6 @@ int SJF(PROCESS Proc[], SIMULATION *Sim)
             ListSim(Sim);
         }
         //SnapShot(Proc, Sim);
-        SJFSort(Proc, Sim);
 
     }
 

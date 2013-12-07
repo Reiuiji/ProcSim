@@ -18,7 +18,7 @@ void IO_FCFS(PROCESS Proc[], SIMULATION *Sim);
 
 int FCFS(PROCESS Proc[], SIMULATION *Sim)
 {
-    bool DEBUG = true;
+    bool DEBUG = false;
     printf("/***********  First-Come-First-Serve Algorithm ***********/\n");
     Sim->Schedule = "FCFS";
     FCFSSort(Proc, Sim);
@@ -35,19 +35,24 @@ int FCFS(PROCESS Proc[], SIMULATION *Sim)
 
 
     int i;
-    for(i = 0; i<6; i++)
+    while(IsProcComplete(Proc, Sim))
     {
+        FCFSSort(Proc, Sim);
+
         //IO_SJF(Proc, Sim);
         RunCPU(Proc, Sim);
         RunIO(Proc, Sim);
+
         Sim->Time++;
         if(DEBUG == true)
         {
             ListProcess(Proc, Sim);
             ListSim(Sim);
         }
+
+        CheckCPU(Proc, Sim);
+        CheckIO(Proc, Sim);
         //SnapShot(Proc, Sim);
-        SJFSort(Proc, Sim);
 
     }
 

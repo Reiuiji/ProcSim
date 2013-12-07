@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     //printf("[DEBUG]: outputing test\n");
     //SnapShot(Proc, SIMINFO);
 
-    SJR(Proc, SIMINFO);
+    SJF(Proc, SIMINFO);
 
     if(test == true)
     {

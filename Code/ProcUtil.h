@@ -38,6 +38,7 @@ typedef struct SimulationInfo
     int IOProc; //number of Processes in the IO Queue
     int CPUJFinished; //[PID]signal to indicate that a process finished its job in the CPU
     int IOJFinished;//[PID] signal to indicate that a IO job is finished
+    int TimeQ;//position of time quantum
     char ** Schedule; //what is the name of the Schedule Algorithm
     char SeqOfProc[]; //the sequency of the processes in the cpu
 

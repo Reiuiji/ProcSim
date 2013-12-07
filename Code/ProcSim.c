@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
     SIMINFO->TimeInterval = atoi(argv[3]);
     //SIMINFO.Schedule = "PS";
 
-    //sprintf(SIMINFO->SeqOfProc, "-1");
+    sprintf(SIMINFO->SeqOfProc, " ");
     PROCESS Proc[SIMINFO->TotalProc];
     SIMINFO->RQProc = InputFromFile(Proc,DATA);
     SIMINFO->IOProc = 0;

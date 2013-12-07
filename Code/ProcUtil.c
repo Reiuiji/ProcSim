@@ -175,72 +175,72 @@ void PreemptiveCheck(PROCESS Proc[], SIMULATION *SIM)
 
 
     // If both exist we are able to check the two together.
-	if((cpu >= 0) && (next_queue >= -0) && ((Proc[cpu].CPU_BURST - Proc[cpu].CPU_Duration) >= 1) && ((Proc[next_queue].CPU_BURST - Proc[next_queue].CPU_Duration) >= 1))
+    if((cpu >= 0) && (next_queue >= -0) && ((Proc[cpu].CPU_BURST - Proc[cpu].CPU_Duration) >= 1) && ((Proc[next_queue].CPU_BURST - Proc[next_queue].CPU_Duration) >= 1))
     {
         printf("\n\nOne of the checks is happening...\n\n");
         printf("Process CPU is: %d\nIts Burst is: %d, Its Completion is: %d\n, Its IO is: %d\n", Proc[cpu].P_ID, Proc[cpu].CPU_BURST, Proc[cpu].CPU_Duration, Proc[cpu].IO_BURST-Proc[cpu].IO_Duration);
-		printf("Process next is: %d\nIts Burst is: %d, Its Completion is: %d\n, Its IO is: %d\n", Proc[next_queue].P_ID, Proc[next_queue].CPU_BURST, Proc[next_queue].CPU_Duration, Proc[next_queue].IO_BURST-Proc[next_queue].IO_Duration);
+        printf("Process next is: %d\nIts Burst is: %d, Its Completion is: %d\n, Its IO is: %d\n", Proc[next_queue].P_ID, Proc[next_queue].CPU_BURST, Proc[next_queue].CPU_Duration, Proc[next_queue].IO_BURST-Proc[next_queue].IO_Duration);
 
         // If the job in the CPU has an IO burst time and the next process has an IO burst time
-		if ((Proc[cpu].IO_BURST-Proc[cpu].IO_Duration >= 1) && (Proc[next_queue].IO_BURST >= 1))
-		{
-		    printf("Check");
-			// It checks to see which one has the shorter IO time using their half bursts.
-			if(((Proc[cpu].CPU_WITH_IO) - Proc[cpu].CPU_Duration) > ((Proc[next_queue].CPU_WITH_IO) - Proc[cpu].CPU_Duration-Proc[next_queue].IO_Duration))
-			{
-				// It swaps them and makes my life easier
-				PROCESS tmp = Proc[cpu];
-				Proc[cpu] = Proc[next_queue];
-				Proc[next_queue] = tmp;
-				SIM->CPU_Current = next_queue;
-				printf("\nyes\n");
-			}
-		}
-
-		// If only the job in the CPU has an IO burst time
-		else if ((Proc[cpu].IO_BURST-Proc[cpu].IO_Duration >= 1) && (Proc[next_queue].IO_BURST-Proc[next_queue].IO_Duration == 0))
-		{
-			// It checks to see which one has the shorter IO time using their half bursts.
-			if(((Proc[cpu].CPU_WITH_IO) - Proc[cpu].CPU_Duration) > ((Proc[next_queue].CPU_BURST) - Proc[cpu].CPU_Duration))
-			{
-				// I really hope that they actually swap
-				PROCESS tmp = Proc[cpu];
-				Proc[cpu] = Proc[next_queue];
-				Proc[next_queue] = tmp;
+        if ((Proc[cpu].IO_BURST-Proc[cpu].IO_Duration >= 1) && (Proc[next_queue].IO_BURST >= 1))
+        {
+            printf("Check");
+            // It checks to see which one has the shorter IO time using their half bursts.
+            if(((Proc[cpu].CPU_WITH_IO) - Proc[cpu].CPU_Duration) > ((Proc[next_queue].CPU_WITH_IO) - Proc[cpu].CPU_Duration-Proc[next_queue].IO_Duration))
+            {
+                // It swaps them and makes my life easier
+                PROCESS tmp = Proc[cpu];
+                Proc[cpu] = Proc[next_queue];
+                Proc[next_queue] = tmp;
                 SIM->CPU_Current = next_queue;
                 printf("\nyes\n");
-			}
-		}
+            }
+        }
 
-		// If only the the next process has an IO burst time
-		else if ((Proc[cpu].IO_BURST-Proc[cpu].IO_Duration == 0) && (Proc[next_queue].IO_BURST-Proc[next_queue].IO_Duration >= 1))
-		{
-			// It checks to see which one has the shorter IO time using their half bursts.
-			if(((Proc[cpu].CPU_BURST) - Proc[cpu].CPU_Duration) > ((Proc[next_queue].CPU_WITH_IO) - Proc[cpu].CPU_Duration))
-			{
-				// Seriously, I've written this section maybe 10 times
-				PROCESS tmp = Proc[cpu];
-				Proc[cpu] = Proc[next_queue];
-				Proc[next_queue] = tmp;
+        // If only the job in the CPU has an IO burst time
+        else if ((Proc[cpu].IO_BURST-Proc[cpu].IO_Duration >= 1) && (Proc[next_queue].IO_BURST-Proc[next_queue].IO_Duration == 0))
+        {
+            // It checks to see which one has the shorter IO time using their half bursts.
+            if(((Proc[cpu].CPU_WITH_IO) - Proc[cpu].CPU_Duration) > ((Proc[next_queue].CPU_BURST) - Proc[cpu].CPU_Duration))
+            {
+                // I really hope that they actually swap
+                PROCESS tmp = Proc[cpu];
+                Proc[cpu] = Proc[next_queue];
+                Proc[next_queue] = tmp;
                 SIM->CPU_Current = next_queue;
                 printf("\nyes\n");
-			}
-		}
+            }
+        }
 
-		// If there are no IO burst times
-		else if ((Proc[cpu].IO_BURST-Proc[cpu].IO_Duration == 0) && (Proc[next_queue].IO_BURST-Proc[next_queue].IO_Duration == 0))
-		{
-			// It checks to see which one has the shorter IO time using their half bursts.
-			if(((Proc[cpu].CPU_BURST) - Proc[cpu].CPU_Duration) > ((Proc[next_queue].CPU_BURST) - Proc[cpu].CPU_Duration))
-			{
-				// If this code breaks again I am going to flip a table
-				PROCESS tmp = Proc[cpu];
-				Proc[cpu] = Proc[next_queue];
-				Proc[next_queue] = tmp;
+        // If only the the next process has an IO burst time
+        else if ((Proc[cpu].IO_BURST-Proc[cpu].IO_Duration == 0) && (Proc[next_queue].IO_BURST-Proc[next_queue].IO_Duration >= 1))
+        {
+            // It checks to see which one has the shorter IO time using their half bursts.
+            if(((Proc[cpu].CPU_BURST) - Proc[cpu].CPU_Duration) > ((Proc[next_queue].CPU_WITH_IO) - Proc[cpu].CPU_Duration))
+            {
+                // Seriously, I've written this section maybe 10 times
+                PROCESS tmp = Proc[cpu];
+                Proc[cpu] = Proc[next_queue];
+                Proc[next_queue] = tmp;
                 SIM->CPU_Current = next_queue;
                 printf("\nyes\n");
-			}
-		}
+            }
+        }
+
+        // If there are no IO burst times
+        else if ((Proc[cpu].IO_BURST-Proc[cpu].IO_Duration == 0) && (Proc[next_queue].IO_BURST-Proc[next_queue].IO_Duration == 0))
+        {
+            // It checks to see which one has the shorter IO time using their half bursts.
+            if(((Proc[cpu].CPU_BURST) - Proc[cpu].CPU_Duration) > ((Proc[next_queue].CPU_BURST) - Proc[cpu].CPU_Duration))
+            {
+                // If this code breaks again I am going to flip a table
+                PROCESS tmp = Proc[cpu];
+                Proc[cpu] = Proc[next_queue];
+                Proc[next_queue] = tmp;
+                SIM->CPU_Current = next_queue;
+                printf("\nyes\n");
+            }
+        }
     }
 }
 
@@ -771,4 +771,49 @@ void SortPID(PROCESS Proc[],SIMULATION *SIM)
         }
     }
 
+}
+
+void PCheckSort(PROCESS Proc[], SIMULATION *SIM)
+{
+    if(SIM->CPU_Current == -1)
+    {
+        return;
+    }
+    int Current = CPUPIDtoPOS(Proc, SIM);
+    int Next = NextQueue(Proc, SIM);//return position of next CPU
+    if(Next == -1)
+    {
+        return; //There is no easter bunny. no more
+    }
+
+    int CPUBurst1, CPUBurst2;
+    if((Proc[Current].IO_BURST > 0))
+    {
+        CPUBurst1 = Proc[Current].CPU_WITH_IO;
+    }
+    else
+    {
+        CPUBurst1 = Proc[Current].CPU_BURST;
+    }
+    CPUBurst1-=Proc[Current].CPU_Duration;
+
+    if((Proc[Next].IO_BURST > 0))
+    {
+        CPUBurst2 = Proc[Next].CPU_WITH_IO;
+    }
+    else
+    {
+        CPUBurst2 = Proc[Next].CPU_BURST;
+    }
+    CPUBurst2-=Proc[Next].CPU_Duration;
+
+    if(CPUBurst1 > CPUBurst2)
+    {
+        PROCESS tmp = Proc[Current];
+        Proc[Current] = Proc[Next];
+        Proc[Next] = tmp;
+        SIM->CPU_Current = Proc[Current].P_ID;
+    }
+
+    return;
 }

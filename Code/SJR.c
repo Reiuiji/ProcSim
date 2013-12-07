@@ -23,7 +23,8 @@ int SJR(PROCESS Proc[], SIMULATION *Sim)
     int i;
     while(IsProcComplete(Proc, Sim)) // While loop that keeps going until everything is finished
     {
-
+        PCheckSort(Proc, Sim);
+        SJRSort(Proc, Sim);
         RunCPU(Proc, Sim); // Simulates a running of the CPU
         RunIO(Proc, Sim); // Simulates a running of the IO
 

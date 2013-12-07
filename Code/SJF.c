@@ -81,7 +81,7 @@ void SJFSort(PROCESS Proc[], SIMULATION *Sim)
             {
                 /* They will use half-IO bursts to determine reordering. This is accomplished by using CPU_WITH_IO instead
                 of CPU_BURST, as it contains what the half of the entire CPU burst cycle will be. */
-                if((Proc[j].CPU_WITH_IO) > (Proc[j+1].CPU_WITH_IO)
+                if((Proc[j].CPU_WITH_IO) > (Proc[j+1].CPU_WITH_IO))
                 {
                     // if true, it reorders them in the queue
                     PROCESS tmp = Proc[j];
@@ -107,7 +107,7 @@ void SJFSort(PROCESS Proc[], SIMULATION *Sim)
             else if((Proc[j].IO_BURST == 0) && (Proc[j+1].IO_BURST >= 1))
             {
                  // The first process uses a full CPU burst for checking and the next will use a half cpu burst.
-                if(Proc[j].CPU_BURST > (Proc[j+1].CPU_WITH_IO)
+                if(Proc[j].CPU_BURST > (Proc[j+1].CPU_WITH_IO))
                 {
                     // if true, it reorders them in the queue
                     PROCESS tmp = Proc[j];

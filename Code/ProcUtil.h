@@ -77,7 +77,7 @@ void FinalReport(PROCESS Proc[],SIMULATION *SIM);
 
 void SeqAdd(SIMULATION *SIM);
 void SortPID(PROCESS Proc[],SIMULATION *SIM);
-
+void PCheckSort(PROCESS Proc[], SIMULATION *SIM);
 
 
 #endif PROCUTIL

@@ -20,40 +20,53 @@ int SJR(PROCESS Proc[], SIMULATION *Sim)
         ListSim(Sim);
     }
 
-
     int i;
-    for(i = 0; i<82; i++)
+    while(IsProcComplete(Proc, Sim)) // While loop that keeps going until everything is finished
     {
-        CheckCPU(Proc, Sim);
-        CheckIO(Proc, Sim);
-
+        PCheckSort(Proc, Sim);
         SJRSort(Proc, Sim);
+        RunCPU(Proc, Sim); // Simulates a running of the CPU
+        RunIO(Proc, Sim); // Simulates a running of the IO
+
+        Sim->Time++; // Updates the timer
+
+        SJRSort(Proc, Sim); // Uses the SJR Sort function to sort by Shortest Job Remaining
+        CheckCPU(Proc, Sim); // Checks the CPU to move / remove any finished CPU processes
+        CheckIO(Proc, Sim);  // Checks the IO to move / remove any finished IO processes
+        // PreemptiveCheck(Proc, Sim);
+        /* The preemptive check is supposed to work but just goes haywire. */
+        /* Preemptive check is located under the ProcUtil.c file. */
+
+
+        if(DEBUG == true)
+        {
+            ListProcess(Proc, Sim);
+            ListSim(Sim);
+        }
+
+        // PreemptiveCheck(Proc,Sim);
+        //SnapShot(Proc, Sim);
+
 
         /* The preemptive check was supposed to check whether or not the process currently loaded in the CPU
         had a CPU burst greater than something waiting in the queue, but it doesn't seem to be working. */
 
-//        PreemptiveCheck(Proc, Sim);
+        // PreemptiveCheck(Proc, Sim);
 
         /* This sort occurs after the preemptive check because it sorts after something is added. */
-
-//        SJRSort(Proc, Sim);
-
-        RunCPU(Proc, Sim);
-        RunIO(Proc, Sim);
-
-        Sim->Time++;
-
-        if(i == 47 || i == 48 || i == 49 || i == 50)
-        {
-            ListProcess(Proc, Sim);
-            ListSim(Sim);
-            printf("The leftover CPU of Process 7 is: %d\n The leftover CPU of Process 2 is: %d",
-                   (Proc[7].CPU_BURST - Proc[7].CPU_Duration),
-                                      (Proc[8].CPU_BURST - Proc[8].CPU_Duration));
-        }
-        //SnapShot(Proc, Sim);
-
     }
+
+
+
+    //Set the last proc Response time
+    current = CPUPIDtoPOS(Proc, Sim);
+    Proc[current].TurnAroundTime = Sim->Time;
+    Sim->CPU_Current = -1; //NO More process it needs to work on
+
+    ListProcess(Proc, Sim);
+    ListSim(Sim);
+
+    FinalReport(Proc, Sim);
 
     return 0;
 }
@@ -63,6 +76,8 @@ int SJR(PROCESS Proc[], SIMULATION *Sim)
 // There needs to be a loop that compares everything to the CPU.
 // If something is lesser, it swaps it with the CPU.
 
+
+/* This is the sorting algorithm for SJR. It is supposed to be preemptive. */
 void SJRSort(PROCESS Proc[], SIMULATION *Sim)
 {
     int i, j, Total = Sim->TotalProc;
@@ -71,41 +86,56 @@ void SJRSort(PROCESS Proc[], SIMULATION *Sim)
     {
         for(j=0; j < Total-1; j++)
         {
+            /* The first thing that it does is check to see whether or not the processes have IO bursts left.
+            The IO_Burst is the entire IO burst cycle, and the duration is how long it has run so far. */
 
-            if((Proc[j].IO_BURST >= 1) && (Proc[j+1].IO_BURST >= 1))
+            // If both Process j and process j+1 have unfinished IO bursts
+			if ((Proc[j].IO_BURST-Proc[j].IO_Duration >= 1) && (Proc[j+1].IO_BURST-Proc[j+1].IO_Duration >= 1))
             {
-                if(((Proc[j].CPU_BURST/2) - Proc[j].CPU_Duration) > ((Proc[(j+1)].CPU_BURST/2) - Proc[(j+1)].CPU_Duration))
+                /* They will use half-IO bursts to determine reordering. This is accomplished by using CPU_WITH_IO instead
+                of CPU_BURST, as it contains what the half of the entire CPU burst cycle will be. */
+                if(((Proc[j].CPU_WITH_IO) - Proc[j].CPU_Duration) > ((Proc[(j+1)].CPU_WITH_IO) - Proc[(j+1)].CPU_Duration))
                 {
+                    // if true, it reorders them in the queue
                     PROCESS tmp = Proc[j];
                     Proc[j] = Proc[j+1];
                     Proc[j+1] = tmp;
                 }
             }
 
-            else if((Proc[j].IO_BURST >= 1) && (Proc[j+1].IO_BURST == 0))
+            // If the first process has an IO burst left and the next does not
+            else if((Proc[j].IO_BURST-Proc[j].IO_Duration >= 1) && (Proc[j+1].IO_BURST-Proc[j+1].IO_Duration == 0))
             {
-                if(((Proc[j].CPU_BURST/2) - Proc[j].CPU_Duration) > (Proc[(j+1)].CPU_BURST - Proc[(j+1)].CPU_Duration))
+                // The first process uses a half CPU burst for checking and the next will use a full cpu burst.
+                if(((Proc[j].CPU_WITH_IO) - Proc[j].CPU_Duration) > (Proc[(j+1)].CPU_BURST - Proc[(j+1)].CPU_Duration))
                 {
+                    // if true, it reorders them in the queue
                     PROCESS tmp = Proc[j];
                     Proc[j] = Proc[j+1];
                     Proc[j+1] = tmp;
                 }
             }
 
-            else if((Proc[j].IO_BURST == 0) && (Proc[j+1].IO_BURST >= 1))
+            // If the first process has no IO burst left and the next does
+            else if((Proc[j].IO_BURST-Proc[j].IO_Duration == 0) && (Proc[j+1].IO_BURST-Proc[j+1].IO_Duration >= 1))
             {
-                if((Proc[j].CPU_BURST - Proc[j].CPU_Duration) > ((Proc[(j+1)].CPU_BURST/2) - Proc[(j+1)].CPU_Duration))
+                // The first process uses its full cpu burst for checking and the next will use a half burst
+                if((Proc[j].CPU_BURST - Proc[j].CPU_Duration) > ((Proc[(j+1)].CPU_WITH_IO) - Proc[(j+1)].CPU_Duration))
                 {
+                    // if true, it reorders them in the queue
                     PROCESS tmp = Proc[j];
                     Proc[j] = Proc[j+1];
                     Proc[j+1] = tmp;
                 }
             }
 
-            else if((Proc[j].IO_BURST == 0) && (Proc[j+1].IO_BURST == 0))
+            // If neither of the two processes have IO bursts
+            else if((Proc[j].IO_BURST-Proc[j].IO_Duration == 0) && (Proc[j+1].IO_BURST-Proc[j+1].IO_Duration == 0))
             {
+                // Both will use their full cpu bursts for checking.
                 if(((Proc[j].CPU_BURST) - Proc[j].CPU_Duration) > ((Proc[(j+1)].CPU_BURST) - Proc[(j+1)].CPU_Duration))
                 {
+                    // if true, it reorders them in the queue
                     PROCESS tmp = Proc[j];
                     Proc[j] = Proc[j+1];
                     Proc[j+1] = tmp;

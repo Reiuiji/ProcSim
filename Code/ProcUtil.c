@@ -39,6 +39,7 @@ int InputFromFile(PROCESS Proc[], FILE *InputFile)
         Proc[pos].ResponseTime = 0;
         Proc[pos].TurnAroundTime = 0;
         Proc[pos].WaitTime = 0;
+        Proc[pos].Waiting = true;
 
         //set the IO hald burst
         if(ioburst != 0)
@@ -236,7 +237,8 @@ bool RunCPU(PROCESS Proc[], SIMULATION *SIM)//run based on the Current Ready Que
         if(Proc[pos].P_ID == SIM->CPU_Current) //search to find which Process it is serving
         {
             Current = pos;
-            Proc[Current].InCPU == true;//indicates it is in the CPU
+	    Proc[pos].Waiting = false;
+           // Proc[Current].InCPU == true;//indicates it is in the CPU
             break; //found the next process to work on
         }
     }
@@ -250,9 +252,9 @@ bool RunCPU(PROCESS Proc[], SIMULATION *SIM)//run based on the Current Ready Que
     //increment the WaitTime for Process not in CPU
     for( pos=0; pos<SIM->TotalProc; pos++)
     {
-        if((pos!= Current) && (Proc[pos].Complete == false))
+        if((SIM->Time > 0) && (Proc[pos].Waiting == true))
         {
-            Proc[pos].WaitTime++;
+            Proc[pos].WaitTime = SIM->Time;
         }
     }
 
@@ -704,8 +706,8 @@ void FinalReport(PROCESS Proc[],SIMULATION *SIM)
 
     for(pos = 0; pos < SIM->TotalProc; pos++)
     {
-        printf("%-5i     	 %-5i\n",Proc[pos].P_ID, Proc[pos].ResponseTime);
-        TotalTimeWaited+= Proc[pos].ResponseTime;
+        printf("%-5i     	 %-5i\n",Proc[pos].P_ID, Proc[pos].WaitTime);
+        TotalTimeWaited+= Proc[pos].WaitTime;
     }
     printf("AVERAGE WAITING TIME = %g\n\n", TotalTimeWaited/(double)pos);
 

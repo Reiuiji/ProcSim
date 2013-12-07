@@ -22,6 +22,7 @@ typedef struct Process
     bool InIO;//indicates that the Process is in the IO
     bool ReadyQueue;//your in the ready queue
     bool DeviceQueue;//your in the device queue
+    bool Waiting;
 
 } PROCESS;
 

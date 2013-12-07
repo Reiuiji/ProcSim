@@ -5,7 +5,7 @@ int RR(PROCESS Proc[], SIMULATION *Sim);
 
 int RR(PROCESS Proc[], SIMULATION *Sim)
 {
-    printf("/***********  Round-Robin Algorithm (time quantum 3)  ***********/\n",);
+    printf("/***********  Round-Robin Algorithm (time quantum 3)  ***********/\n");
 
     Sim->Schedule = "RR";
 

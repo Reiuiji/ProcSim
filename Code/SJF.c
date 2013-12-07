@@ -60,13 +60,11 @@ int SJF(PROCESS Proc[], SIMULATION *Sim)
 
     FinalReport(Proc, Sim);
 
-
-
-
     return 0;
 }
 
 
+/* This is the sorting algorithm for shortest job first */
 void SJFSort(PROCESS Proc[], SIMULATION *Sim)
 {
     int i, j, Total = Sim->TotalProc;
@@ -75,38 +73,56 @@ void SJFSort(PROCESS Proc[], SIMULATION *Sim)
     {
         for(j=0; j < Total-1; j++)
         {
+            /* The first thing that it does is check to see whether or not the processes have IO bursts left.
+            The IO_Burst is the entire IO burst cycle, and the duration is how long it has run so far. */
 
+            // If both Process j and process j+1 have unfinished IO bursts
             if((Proc[j].IO_BURST >= 1) && (Proc[j+1].IO_BURST >= 1))
             {
-                if((Proc[j].CPU_BURST/2) > (Proc[j+1].CPU_BURST/2))
+                /* They will use half-IO bursts to determine reordering. This is accomplished by using CPU_WITH_IO instead
+                of CPU_BURST, as it contains what the half of the entire CPU burst cycle will be. */
+                if((Proc[j].CPU_WITH_IO) > (Proc[j+1].CPU_WITH_IO)
                 {
+                    // if true, it reorders them in the queue
                     PROCESS tmp = Proc[j];
                     Proc[j] = Proc[j+1];
                     Proc[j+1] = tmp;
                 }
             }
+
+            // If process j has an unfinished IO burst and process j+1 has no unfinished IO burst
             else if((Proc[j].IO_BURST >= 1) && (Proc[j+1].IO_BURST == 0))
             {
-                if((Proc[j].CPU_BURST/2) > Proc[j+1].CPU_BURST)
+                 // The first process uses a half CPU burst for checking and the next will use a full cpu burst.
+                if((Proc[j].CPU_WITH_IO) > Proc[j+1].CPU_BURST)
                 {
+                    // if true, it reorders them in the queue
                     PROCESS tmp = Proc[j];
                     Proc[j] = Proc[j+1];
                     Proc[j+1] = tmp;
                 }
             }
+
+            // If process j has no IO burst and process j+1 has an unfinished IO burst
             else if((Proc[j].IO_BURST == 0) && (Proc[j+1].IO_BURST >= 1))
             {
-                if(Proc[j].CPU_BURST > (Proc[j+1].CPU_BURST/2))
+                 // The first process uses a full CPU burst for checking and the next will use a half cpu burst.
+                if(Proc[j].CPU_BURST > (Proc[j+1].CPU_WITH_IO)
                 {
+                    // if true, it reorders them in the queue
                     PROCESS tmp = Proc[j];
                     Proc[j] = Proc[j+1];
                     Proc[j+1] = tmp;
                 }
             }
+
+            // If both Process j and process j+1 have no IO bursts
             else if((Proc[j].IO_BURST == 0) && (Proc[j+1].IO_BURST == 0))
             {
+                 // The first process uses a full CPU burst for checking and the next will use a full cpu burst.
                 if(Proc[j].CPU_BURST > Proc[j+1].CPU_BURST)
                 {
+                    // if true, it reorders them in the queue
                     PROCESS tmp = Proc[j];
                     Proc[j] = Proc[j+1];
                     Proc[j+1] = tmp;
@@ -115,29 +131,3 @@ void SJFSort(PROCESS Proc[], SIMULATION *Sim)
         }
     }
 }
-
-//return the PID with the shortest job in the Device Queue
-//void IO_SJF(PROCESS Proc[], SIMULATION *Sim)
-//{
-//    int pos, Current, Total = Sim->TotalProc;
-//
-//    if((Sim->IO_Current == -1) || (Proc[IOPIDtoPOS(Proc, Sim)].DeviceQueue == false))
-//    {
-//        Sim->IO_Current = NextIO(Proc, Sim);
-//    }
-//    Current = IOPIDtoPOS(Proc, Sim);
-//
-//    for(pos=0; pos < Total; pos++)
-//    {
-//        if((Proc[pos].DeviceQueue == true))
-//        {
-//            if((Proc[Sim->IO_Current].IO_BURST-Proc[Sim->IO_Current].IO_Duration) > (Proc[pos].IO_BURST-Proc[pos].IO_Duration))
-//            {
-//                Sim->IO_Current = Proc[pos].P_ID;
-//            }
-//        }
-//
-//    }
-//
-//}
-

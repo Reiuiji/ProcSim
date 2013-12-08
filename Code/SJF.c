@@ -29,7 +29,6 @@ int SJF(PROCESS Proc[], SIMULATION *Sim)
     CheckCPU(Proc, Sim);
     CheckIO(Proc, Sim);
 
-    int i;
     while(IsProcComplete(Proc, Sim))
     {
 

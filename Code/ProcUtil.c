@@ -132,11 +132,14 @@ bool CheckIO(PROCESS Proc[], SIMULATION *SIM)
                 Proc[pos].Complete = true;
                 Proc[pos].ReadyQueue = false;
                 Proc[pos].DeviceQueue = false;
+                SIM->IOProc--;
             }
             else
             {
                 Proc[pos].ReadyQueue = true;
+                SIM->RQProc++;
                 Proc[pos].DeviceQueue = false;
+                SIM->IOProc--;
                 Proc[pos].Waiting = true;
                 if(SIM->IOJFinished == -1)
                 {
@@ -258,6 +261,14 @@ bool RunCPU(PROCESS Proc[], SIMULATION *SIM)//run based on the Current Ready Que
 
     if(SIM->CPU_Current == -1)//returns false since there is no more CPU so it is finished
     {
+
+        if(SIM->Time%SIM->TimeInterval == 0)
+        {
+            printf("\nt = %i\n",SIM->Time);
+            printf("CPU WAITING...\n");
+            SIM->CPU_Idle++;//increment the idle time
+            DisplayReadyQueue(Proc, SIM);
+        }
         return false;
     }
 
@@ -266,16 +277,10 @@ bool RunCPU(PROCESS Proc[], SIMULATION *SIM)//run based on the Current Ready Que
         if(Proc[pos].P_ID == SIM->CPU_Current) //search to find which Process it is serving
         {
             Current = pos;
-	    Proc[pos].Waiting = false;
-           // Proc[Current].InCPU == true;//indicates it is in the CPU
+            Proc[pos].Waiting = false;
+            // Proc[Current].InCPU == true;//indicates it is in the CPU
             break; //found the next process to work on
         }
-    }
-
-    if(Current == -1)//returns false: cant Find the current Process in the queue
-    {
-        SIM->CPU_Idle++;//increment the idle time
-        return false;
     }
 
     //increment the WaitTime for Process not in CPU
@@ -331,12 +336,28 @@ bool RunCPU(PROCESS Proc[], SIMULATION *SIM)//run based on the Current Ready Que
 
         if(SIM->Time%SIM->TimeInterval == 0)
         {
-            printf("JOB %i finished CPU burst\n",Proc[Current].P_ID);
+            if(SIM->RQProc == 0)
+            {
+                printf("CPU WAITING...\n");
+                SIM->CPU_Idle++;
+            }
+            else
+            {
+                printf("JOB %i finished CPU burst\n",Proc[Current].P_ID);
+            }
         }
 
         SIM->CPU_Current = NextQueue(Proc, SIM);//grabs the next on the queue
 
         Current = CPUPIDtoPOS(Proc, SIM);
+        if(Current == -1)
+        {
+            if(SIM->Time%SIM->TimeInterval == 0)
+            {
+                DisplayReadyQueue(Proc, SIM);
+            }
+            return false;
+        }
 
         if(SIM->Time%SIM->TimeInterval == 0)
         {
@@ -359,6 +380,7 @@ bool RunCPU(PROCESS Proc[], SIMULATION *SIM)//run based on the Current Ready Que
     else if((Proc[Current].CPU_Duration == Proc[Current].CPU_BURST) && (Proc[Current].IO_Duration == Proc[Current].IO_BURST ))//(LOADED_CPU_BURST == 0) && (LOADED_IO_BURST == 0))
     {
         Proc[Current].ReadyQueue = false;//out of the ready que
+        SIM->RQProc--;
         Proc[Current].FinishTime = SIM->Time; // sets the time when the Process finishes
         Proc[Current].TurnAroundTime = SIM->Time;
         Proc[Current].Complete = true;//yay the process is finished

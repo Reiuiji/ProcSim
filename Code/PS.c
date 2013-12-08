@@ -20,6 +20,7 @@ int PS(PROCESS Proc[], SIMULATION *Sim)
 
     while(IsProcComplete(Proc, Sim))
     {
+
         PSSort(Proc, Sim);
 
         RunCPU(Proc, Sim);

@@ -31,7 +31,6 @@ int main(int argc, char *argv[])
     SIMINFO->IOJFinished = -1;//indicate no jobs finished
     SIMINFO->TotalProc = atoi(argv[2]);
     SIMINFO->TimeInterval = atoi(argv[3]);
-    //SIMINFO.Schedule = "PS";
 
     sprintf(SIMINFO->SeqOfProc, " ");
     PROCESS Proc[SIMINFO->TotalProc];
@@ -39,12 +38,12 @@ int main(int argc, char *argv[])
     SIMINFO->IOProc = 0;
     //ListProcess(Proc,SIMINFO);
 
-//just runs the Priority Sort algorithm
-    //PS(Proc,SIMINFO);
-    //printf("[DEBUG]: outputing test\n");
-    //SnapShot(Proc, SIMINFO);
+//just uncomment what function you need
 
-    SJF(Proc, SIMINFO);
+    //FCFS(Proc, SIMINFO);
+    PS(Proc,SIMINFO);
+    //SJF(Proc, SIMINFO);
+    //SJR(Proc, SIMINFO);
 
     if(test == true)
     {

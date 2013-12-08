@@ -31,6 +31,7 @@ int main(int argc, char *argv[])
     SIMINFO->IOJFinished = -1;//indicate no jobs finished
     SIMINFO->TotalProc = atoi(argv[2]);
     SIMINFO->TimeInterval = atoi(argv[3]);
+    SIMINFO->PCheck = false;
 
     sprintf(SIMINFO->SeqOfProc, " ");
     PROCESS Proc[SIMINFO->TotalProc];
@@ -41,9 +42,9 @@ int main(int argc, char *argv[])
 //just uncomment what function you need
 
     //FCFS(Proc, SIMINFO);
-    PS(Proc,SIMINFO);
+    //PS(Proc,SIMINFO);
     //SJF(Proc, SIMINFO);
-    //SJR(Proc, SIMINFO);
+    SJR(Proc, SIMINFO);
 
     if(test == true)
     {

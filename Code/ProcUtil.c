@@ -252,6 +252,7 @@ void PreemptiveCheck(PROCESS Proc[], SIMULATION *SIM)
 bool RunCPU(PROCESS Proc[], SIMULATION *SIM)//run based on the Current Ready Que
 {
     int pos;
+    bool PcheckOccurs = false;//indicate that pcheck changed the order
     int Current = -1;//-1 acts as a error if the next for cant find the process
 
     if(SIM->RQProc > 0 && SIM->CPU_Current == -1)
@@ -270,6 +271,59 @@ bool RunCPU(PROCESS Proc[], SIMULATION *SIM)//run based on the Current Ready Que
             DisplayReadyQueue(Proc, SIM);
         }
         return false;
+    }
+
+    if(SIM->PCheck == true)
+    {
+        if(SIM->IOJFinished != -1)
+        {
+            //Sim->CPU_Current = -1;//reset the current processor
+            //printf("[DEBUG]: Job finished\n");
+            //ListProcess(Proc, SIM);
+            //ListSim(SIM);
+
+            if(SIM->CPU_Current/*PID*/ != NextQueue(Proc,SIM)/*PID*/);//checks if it needs to switch the current CPU
+            {
+                int NextProc = NextQueue(Proc,SIM);
+                //printf("NextQueue= %i\n",NextQueue(Proc,SIM));
+
+                for( pos=0; pos<SIM->TotalProc; pos++)//check each Process to see
+                {
+                    if(Proc[pos].P_ID == SIM->CPU_Current) //search to find which Process it is serving
+                    {
+                        Current = pos;
+                        //Proc[pos].Waiting = false;
+                        break; //found the next process to work on
+                    }
+                }
+
+
+                for( pos=0; pos<SIM->TotalProc; pos++)//check each Process to see
+                {
+                    if(Proc[pos].P_ID == NextProc) //search to find which Process it is serving
+                    {
+                        NextProc = pos;
+                        //Proc[pos].Waiting = false;
+                        break; //found the next process to work on
+                    }
+                }
+                if(Proc[NextProc].P_ID != SIM->CPU_Current)
+                {
+                    //Proc[NextProc]
+                    if(SIM->Time%SIM->TimeInterval == 0)
+                    {
+                        printf("\nt = %i\n",SIM->Time);
+                        printf("JOB %i finished CPU burst\n", SIM->CPU_Current);
+                        printf("CPU loading job %i: CPU burst(%i) IO burst(%i)\n", Proc[NextProc].P_ID, Proc[NextProc].CPU_BURST-Proc[NextProc].CPU_Duration, Proc[NextProc].IO_BURST-Proc[NextProc].IO_Duration);
+                        PcheckOccurs = true;
+                    }
+                    Proc[Current].Waiting = true;
+                    Proc[NextProc].Waiting = false;
+                    SIM->CPU_Current = Proc[NextProc].P_ID;
+                    SeqAdd(SIM);
+                }
+            }
+        }
     }
 
     for( pos=0; pos<SIM->TotalProc; pos++)//check each Process to see
@@ -295,28 +349,33 @@ bool RunCPU(PROCESS Proc[], SIMULATION *SIM)//run based on the Current Ready Que
             Proc[pos].WaitTime++;
         }
     }
-
-
-
     //output the time line for the snapshot
-    if(SIM->Time%SIM->TimeInterval == 0)
+    if((SIM->Time%SIM->TimeInterval == 0) && (PcheckOccurs == false))
     {
         printf("\nt = %i\n",SIM->Time);
-        if(SIM->Time == 0)//indicates start of simulation
+
+    }
+
+    if(SIM->Time == 0)//indicates start of simulation
+    {
+
+        int CPUBurstI;
+        if((Proc[Current].IO_Duration == 0) && (Proc[Current].IO_BURST > 0))
         {
-            int CPUBurstI;
-            if((Proc[Current].IO_Duration == 0) && (Proc[Current].IO_BURST > 0))
-            {
-                CPUBurstI = Proc[Current].CPU_WITH_IO;
-            }
-            else
-            {
-                CPUBurstI = Proc[Current].CPU_BURST;
-            }
-            SeqAdd(SIM);
+            CPUBurstI = Proc[Current].CPU_WITH_IO;
+        }
+        else
+        {
+            CPUBurstI = Proc[Current].CPU_BURST;
+        }
+        if(SIM->Time%SIM->TimeInterval == 0)
+        {
             printf("CPU loading job %i : CPU burst (%i) IO burst (%i) \n",Proc[Current].P_ID, CPUBurstI, Proc[Current].IO_BURST - Proc[Current].IO_Duration);
         }
+        SeqAdd(SIM);
     }
+
+
 
     // Checks the process data if this is it first time in the CPU
     if(Proc[Current].CPU_Duration == 1)
@@ -334,12 +393,16 @@ bool RunCPU(PROCESS Proc[], SIMULATION *SIM)//run based on the Current Ready Que
         SIM->RQProc--;
         Proc[Current].InCPU = false;
 
-        if(SIM->Time%SIM->TimeInterval == 0)
+        if(SIM->RQProc == 0)
+        {
+            SIM->CPU_Idle++;
+        }
+
+        if((SIM->Time%SIM->TimeInterval == 0) && (PcheckOccurs == false))
         {
             if(SIM->RQProc == 0)
             {
                 printf("CPU WAITING...\n");
-                SIM->CPU_Idle++;
             }
             else
             {
@@ -358,22 +421,20 @@ bool RunCPU(PROCESS Proc[], SIMULATION *SIM)//run based on the Current Ready Que
             }
             return false;
         }
-
-        if(SIM->Time%SIM->TimeInterval == 0)
+        int CPUBurst;
+        if((Proc[Current].IO_Duration == 0) && (Proc[Current].IO_BURST > 0))
         {
-            int CPUBurst;
-            if((Proc[Current].IO_Duration == 0) && (Proc[Current].IO_BURST > 0))
-            {
-                CPUBurst = Proc[Current].CPU_WITH_IO;
-            }
-            else
-            {
-                CPUBurst = Proc[Current].CPU_BURST;
-            }
-            SeqAdd(SIM);
+            CPUBurst = Proc[Current].CPU_WITH_IO;
+        }
+        else
+        {
+            CPUBurst = Proc[Current].CPU_BURST;
+        }
+        if(SIM->Time%SIM->TimeInterval == 0 && (PcheckOccurs == false))
+        {
             printf("CPU loading job %i: CPU burst(%i) IO burst(%i)\n",Proc[Current].P_ID, CPUBurst-Proc[Current].CPU_Duration, Proc[Current].IO_BURST-Proc[Current].IO_Duration);
         }
-
+        SeqAdd(SIM);
     }
 
     // Checks the process data. If there's a program that has finished its CPU burst and has finished its IO burst, it gets removed.
@@ -394,49 +455,49 @@ bool RunCPU(PROCESS Proc[], SIMULATION *SIM)//run based on the Current Ready Que
 
         Current = CPUPIDtoPOS(Proc, SIM);
 
-        if(SIM->Time%SIM->TimeInterval == 0)
+        int CPUBurst;
+        if((Proc[Current].IO_Duration == 0) && (Proc[Current].IO_BURST > 0))
         {
-            int CPUBurst;
-            if((Proc[Current].IO_Duration == 0) && (Proc[Current].IO_BURST > 0))
-            {
-                CPUBurst = Proc[Current].CPU_WITH_IO;
-            }
-            else
-            {
-                CPUBurst = Proc[Current].CPU_BURST;
-            }
-            SeqAdd(SIM);
-            printf("CPU loading job %i: CPU burst(%i) IO burst(%i)\n",Proc[Current].P_ID, CPUBurst-Proc[Current].CPU_Duration, Proc[Current].IO_BURST-Proc[Current].IO_Duration);
+            CPUBurst = Proc[Current].CPU_WITH_IO;
+        }
+        else
+        {
+            CPUBurst = Proc[Current].CPU_BURST;
         }
 
+        if(SIM->Time%SIM->TimeInterval == 0)
+        {
+            printf("CPU loading job %i: CPU burst(%i) IO burst(%i)\n",Proc[Current].P_ID, CPUBurst-Proc[Current].CPU_Duration, Proc[Current].IO_BURST-Proc[Current].IO_Duration);
+        }
+        SeqAdd(SIM);
     }
     else
     {
-        if((SIM->Time%SIM->TimeInterval == 0) && (SIM->Time != 0))
+
+        int CPUBurst;
+        if((Proc[Current].IO_Duration == 0) && (Proc[Current].IO_BURST > 0))
         {
-            int CPUBurst;
-            if((Proc[Current].IO_Duration == 0) && (Proc[Current].IO_BURST > 0))
-            {
-                CPUBurst = Proc[Current].CPU_WITH_IO;
-            }
-            else
-            {
-                CPUBurst = Proc[Current].CPU_BURST;
-            }
-
-            printf("Servicing %s job %i: CPU burst(%i) IO burst(%i)\n",SIM->Schedule, Proc[Current].P_ID, CPUBurst - Proc[Current].CPU_Duration, Proc[Current].IO_BURST - Proc[Current].IO_Duration );
-
-            if(SIM->Time%SIM->TimeInterval == 0)
-            {
-                Proc[Current].ReadyQueue = false;//quick and dirty way to make the display ready queue will not output the Process it is serving
-                DisplayReadyQueue(Proc, SIM);
-                Proc[Current].ReadyQueue = true;
-            }
-
-            Proc[Current].CPU_Duration++;
-            return true;
-
+            CPUBurst = Proc[Current].CPU_WITH_IO;
         }
+        else
+        {
+            CPUBurst = Proc[Current].CPU_BURST;
+        }
+        if((SIM->Time%SIM->TimeInterval == 0) && (SIM->Time != 0) && (PcheckOccurs == false))
+        {
+            printf("Servicing %s job %i: CPU burst(%i) IO burst(%i)\n",SIM->Schedule, Proc[Current].P_ID, CPUBurst - Proc[Current].CPU_Duration, Proc[Current].IO_BURST - Proc[Current].IO_Duration );
+        }
+        if(SIM->Time%SIM->TimeInterval == 0)
+        {
+            Proc[Current].ReadyQueue = false;//quick and dirty way to make the display ready queue will not output the Process it is serving
+            DisplayReadyQueue(Proc, SIM);
+            Proc[Current].ReadyQueue = true;
+        }
+
+        Proc[Current].CPU_Duration++;
+        return true;
+
+
     }
 
     if(SIM->Time%SIM->TimeInterval == 0)
@@ -691,7 +752,7 @@ void FinalReport(PROCESS Proc[],SIMULATION *SIM)
     for(pos = 0; pos < SIM->TotalProc; pos++)
     {
         waittime = Proc[pos].WaitTime;
-        if(Proc[pos].IO_BURST > 0)
+        if((Proc[pos].IO_BURST > 0) && (waittime > 0))
         {
             waittime--;
         }
@@ -700,7 +761,7 @@ void FinalReport(PROCESS Proc[],SIMULATION *SIM)
     }
     printf("AVERAGE WAITING TIME = %g\n\n", TotalTimeWaited/(double)pos);
 
-    printf("CPU UTILIZATION = %g\%\n\n",((SIM->Time-SIM->CPU_Idle)/(double)SIM->Time)*100);
+    printf("CPU UTILIZATION = %3.0lf\%\n\n",((SIM->Time-SIM->CPU_Idle)/(double)SIM->Time)*100);
 
     printf("SEQUENCE OF PROCESSES IN CPU:%s\n\n", SIM->SeqOfProc);
 
@@ -738,105 +799,106 @@ void SortPID(PROCESS Proc[],SIMULATION *SIM)
 
 void PCheckSort(PROCESS Proc[], SIMULATION *SIM)
 {
-	// This is the "I give up, if you're going to play this game, let's play." workaround for CPU sort.
-	int CPUproc = -1, NEXTproc, CPUBurstC, CPUBurstN, CPUBursti, CPUBurstj, smburst = -1, i,j;
+    // This is the "I give up, if you're going to play this game, let's play." workaround for CPU sort.
+    int CPUproc = -1, NEXTproc, CPUBurstC, CPUBurstN, CPUBursti, CPUBurstj, smburst = -1, i,j;
 
-        // Attempts to check what process is in the CPU. Fails.
-		for(i=0; i<SIM->TotalProc; i++)
-		{
-			if((Proc[i].InCPU == true))
-			{
-				CPUproc = i;
-				i = SIM->TotalProc;
-			}
-		}
+    // Attempts to check what process is in the CPU. Fails.
+    for(i=0; i<SIM->TotalProc; i++)
+    {
+        if((Proc[i].InCPU == true))
+        {
+            CPUproc = i;
+            i = SIM->TotalProc;
+        }
+    }
 
-        printf("The Process in the CPU is: %d\n", Proc[CPUproc].P_ID);
-        printf("It's remaining burst time is: %d\n", Proc[CPUproc].CPU_BURST - Proc[CPUproc].CPU_Duration);
+    printf("The Process in the CPU is: %d\n", Proc[CPUproc].P_ID);
+    printf("It's remaining burst time is: %d\n", Proc[CPUproc].CPU_BURST - Proc[CPUproc].CPU_Duration);
 
-        // Attempts to find the smallest CPU burst among the non-CPU, non-io processes. Fails.
-		for(i=0; i<SIM->TotalProc; i++)
-		{
-			for(j=0; j<SIM->TotalProc; j++)
-			{
-				if((i != j) && (Proc[i].CPU_BURST > 0) && (Proc[j].CPU_BURST > 0) && (Proc[i].ReadyQueue == true) && (Proc[j].ReadyQueue == true))
-				{
-					if((Proc[i].IO_BURST) > 0)
-					{
-						CPUBursti = Proc[i].CPU_WITH_IO;
-					}
-					else
-					{
-						CPUBursti = Proc[i].CPU_BURST;
-					}
+    // Attempts to find the smallest CPU burst among the non-CPU, non-io processes. Fails.
+    for(i=0; i<SIM->TotalProc; i++)
+    {
+        for(j=0; j<SIM->TotalProc; j++)
+        {
+            if((i != j) && (Proc[i].CPU_BURST > 0) && (Proc[j].CPU_BURST > 0) && (Proc[i].ReadyQueue == true) && (Proc[j].ReadyQueue == true))
+            {
+                if((Proc[i].IO_BURST) > 0)
+                {
+                    CPUBursti = Proc[i].CPU_WITH_IO;
+                }
+                else
+                {
+                    CPUBursti = Proc[i].CPU_BURST;
+                }
 
-					CPUBursti -= Proc[i].CPU_Duration;
+                CPUBursti -= Proc[i].CPU_Duration;
 
-					if((Proc[j].IO_BURST) > 0)
-					{
-						CPUBurstj = Proc[j].CPU_WITH_IO;
-					}
-					else
-					{
-						CPUBurstj = Proc[j].CPU_BURST;
-					}
+                if((Proc[j].IO_BURST) > 0)
+                {
+                    CPUBurstj = Proc[j].CPU_WITH_IO;
+                }
+                else
+                {
+                    CPUBurstj = Proc[j].CPU_BURST;
+                }
 
-					CPUBurstj -= Proc[j].CPU_Duration;
+                CPUBurstj -= Proc[j].CPU_Duration;
 
-					if(CPUBursti > CPUBurstj)
-					{
-						smburst = j;
-					}
-					else if(CPUBursti < CPUBurstj)
-					{
-						smburst = i;
-					}
-					else
-					{
-						smburst = i;
-					}
-				}
-			}
-		}
-        printf("The smallest burst is process %d\n", Proc[smburst].P_ID);
-        printf("It's remaining burst time is: %d\n", Proc[smburst].CPU_BURST - Proc[smburst].CPU_Duration);
+                if(CPUBursti > CPUBurstj)
+                {
+                    smburst = j;
+                }
+                else if(CPUBursti < CPUBurstj)
+                {
+                    smburst = i;
+                }
+                else
+                {
+                    smburst = i;
+                }
+            }
+        }
+    }
+    printf("The smallest burst is process %d\n", Proc[smburst].P_ID);
+    printf("It's remaining burst time is: %d\n", Proc[smburst].CPU_BURST - Proc[smburst].CPU_Duration);
 
-        // If they both exits (this never works)
-		if((CPUproc != -1) && (smburst != -1))
-		{
-            // Checks to see when to use w/io burst times
-			if((Proc[CPUproc].IO_BURST) > 0)
-			{
-				CPUBurstC = Proc[CPUproc].CPU_WITH_IO;
-			}
-			else
-			{
-				CPUBurstC = Proc[CPUproc].CPU_BURST;
-			}
-            // Subtracts the duration
-			CPUBurstC -= Proc[CPUproc].CPU_Duration;
+    // If they both exits (this never works)
+    if((CPUproc != -1) && (smburst != -1))
+    {
+        // Checks to see when to use w/io burst times
+        if((Proc[CPUproc].IO_BURST) > 0)
+        {
+            CPUBurstC = Proc[CPUproc].CPU_WITH_IO;
+        }
+        else
+        {
+            CPUBurstC = Proc[CPUproc].CPU_BURST;
+        }
+        // Subtracts the duration
+        CPUBurstC -= Proc[CPUproc].CPU_Duration;
 
-            // same as above
-			if((Proc[smburst].IO_BURST) > 0)
-			{
-				CPUBurstN = Proc[smburst].CPU_WITH_IO;
-			}
-			else
-			{
-				CPUBurstN = Proc[smburst].CPU_BURST;
-			}
-            // ...
-			CPUBurstN -= Proc[CPUproc].CPU_Duration;
+        // same as above
+        if((Proc[smburst].IO_BURST) > 0)
+        {
+            CPUBurstN = Proc[smburst].CPU_WITH_IO;
+        }
+        else
+        {
+            CPUBurstN = Proc[smburst].CPU_BURST;
+        }
+        // ...
+        CPUBurstN -= Proc[CPUproc].CPU_Duration;
 
-            // swaps
-	   		if(CPUBurstC > CPUBurstN)
-	    		{
-	        		PROCESS tmp = Proc[CPUproc];
-	        		Proc[CPUproc] = Proc[smburst];
-	        		Proc[smburst] = tmp;
+        // swaps
+        if(CPUBurstC > CPUBurstN)
+        {
+            PROCESS tmp = Proc[CPUproc];
+            Proc[CPUproc] = Proc[smburst];
+            Proc[smburst] = tmp;
 
-	        		SIM->CPU_Current = Proc[CPUproc].P_ID;
-	    		}
-		}
+            SIM->CPU_Current = Proc[CPUproc].P_ID;
+        }
+    }
     return;
 }
+

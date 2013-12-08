@@ -14,6 +14,7 @@ int PS(PROCESS Proc[], SIMULATION *Sim)
     //setup ready/IO current
     Sim->CPU_Current = Proc[0].P_ID;
     Sim->IO_Current = -1;
+    Sim->PCheck = true; //enable preemtive check
 
     CheckCPU(Proc, Sim);
     CheckIO(Proc, Sim);
@@ -33,6 +34,8 @@ int PS(PROCESS Proc[], SIMULATION *Sim)
     Proc[CPUPIDtoPOS(Proc, Sim)].TurnAroundTime = Sim->Time;
     Sim->CPU_Current = -1;
 
+    ListProcess(Proc, Sim);
+    ListSim(Sim);
     FinalReport(Proc, Sim);
 
     return 0;

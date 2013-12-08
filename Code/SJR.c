@@ -14,6 +14,7 @@ int SJR(PROCESS Proc[], SIMULATION *Sim)
     int current = Proc[0].P_ID;
     Sim->CPU_Current = current; //set at the first Process in the ready Que
     Sim->IO_Current = -1; //there is none
+    Sim->PCheck = true; //enable preemtive check
     if(DEBUG == true)
     {
         ListProcess(Proc, Sim);
@@ -21,21 +22,31 @@ int SJR(PROCESS Proc[], SIMULATION *Sim)
     }
 
     int i;
+
+    CheckCPU(Proc, Sim); // Checks the CPU to move / remove any finished CPU processes
+    CheckIO(Proc, Sim);  // Checks the IO to move / remove any finished IO processes
+
     while(IsProcComplete(Proc, Sim)) // While loop that keeps going until everything is finished
     {
-        PCheckSort(Proc, Sim);
+        //PCheckSort(Proc, Sim);
         SJRSort(Proc, Sim);
+if(Sim->Time == 50)
+{
+    ListProcess(Proc, Sim);
+    ListSim(Sim);
+}
         RunCPU(Proc, Sim); // Simulates a running of the CPU
         RunIO(Proc, Sim); // Simulates a running of the IO
 
         Sim->Time++; // Updates the timer
 
         SJRSort(Proc, Sim); // Uses the SJR Sort function to sort by Shortest Job Remaining
-        CheckCPU(Proc, Sim); // Checks the CPU to move / remove any finished CPU processes
-        CheckIO(Proc, Sim);  // Checks the IO to move / remove any finished IO processes
         // PreemptiveCheck(Proc, Sim);
         /* The preemptive check is supposed to work but just goes haywire. */
         /* Preemptive check is located under the ProcUtil.c file. */
+
+        CheckCPU(Proc, Sim); // Checks the CPU to move / remove any finished CPU processes
+        CheckIO(Proc, Sim);  // Checks the IO to move / remove any finished IO processes
 
 
         if(DEBUG == true)
@@ -90,7 +101,7 @@ void SJRSort(PROCESS Proc[], SIMULATION *Sim)
             The IO_Burst is the entire IO burst cycle, and the duration is how long it has run so far. */
 
             // If both Process j and process j+1 have unfinished IO bursts
-			if ((Proc[j].IO_BURST-Proc[j].IO_Duration >= 1) && (Proc[j+1].IO_BURST-Proc[j+1].IO_Duration >= 1))
+            if ((Proc[j].IO_BURST-Proc[j].IO_Duration >= 1) && (Proc[j+1].IO_BURST-Proc[j+1].IO_Duration >= 1))
             {
                 /* They will use half-IO bursts to determine reordering. This is accomplished by using CPU_WITH_IO instead
                 of CPU_BURST, as it contains what the half of the entire CPU burst cycle will be. */

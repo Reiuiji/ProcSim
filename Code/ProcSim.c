@@ -43,6 +43,7 @@ int main(int argc, char *argv[])
 
     //FCFS(Proc, SIMINFO);
     //PS(Proc,SIMINFO);
+    //SJR(Proc, SIMINFO);
     //SJF(Proc, SIMINFO);
     //FCFS(Proc, SIMINFO);
     RR(Proc, SIMINFO);

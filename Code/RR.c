@@ -33,9 +33,9 @@ void RoundRobin(PROCESS Proc[], SIMULATION *Sim, int TimeQuantum)
 //Simulate CPU
 //CurrentProc = F_DEL(ReadyQueue);
 
-  while(!F_Empty(ReadyQueue) || !F_Empty(ReadyQueue))
+  while(!F_Empty(ReadyQueue) || !F_Empty(IOQueue))
     {
-        if(CurrentProc != NULL)
+      if(CurrentProc != NULL)
         {
           CurrentProc->CPU_Duration++;//increment the current Proc
         }
@@ -43,51 +43,49 @@ void RoundRobin(PROCESS Proc[], SIMULATION *Sim, int TimeQuantum)
         {
           Sim->CPU_Idle++;
         }
+
       if(Sim->Time%Sim->TimeInterval == 0)
         {
           printf("\nt = %i\n",Sim->Time);
         }
 
       //Reset the CPU if the it hits the TimeQuantum or reached its CPU Burst
-      if(TimeQ%TimeQuantum == 0 || (CurrentProc->CPU_BURST == CurrentProc->CPU_Duration) || ((CurrentProc->IO_BURST > 0) && (CurrentProc->CPU_BURST/2 == CurrentProc->CPU_Duration)))
-        {
-
-          if(CurrentProc != NULL && Sim->Time > 0)
+          if(TimeQ%TimeQuantum == 0 || (CurrentProc->CPU_BURST == CurrentProc->CPU_Duration) || ((CurrentProc->IO_BURST > 0) && (CurrentProc->CPU_BURST/2 == CurrentProc->CPU_Duration)))
             {
-              if(Sim->Time%Sim->TimeInterval == 0)
+
+              if(CurrentProc != NULL && Sim->Time > 0)
                 {
-                  printf("JOB %i finished CPU burst\n",CurrentProc->P_ID);
+                  if(Sim->Time%Sim->TimeInterval == 0)
+                    {
+                      printf("JOB %i finished CPU burst\n",CurrentProc->P_ID);
+                    }
                 }
-            }
 
-          if((Sim->Time%Sim->TimeInterval) == 0)
-            {
-              printf("CPU loading job %i: ",F_ATProc(ReadyQueue,0)->P_ID);
-            }
+              if(((Sim->Time%Sim->TimeInterval) == 0) && (!F_Empty(ReadyQueue)))
+                {
+                  printf("CPU loading job %i: ",F_ATProc(ReadyQueue,0)->P_ID);
+                }
 
-          //checks if it needs to go in the IO
-          if((CurrentProc->IO_BURST > 0) && (CurrentProc->CPU_BURST/2 == CurrentProc->CPU_Duration))
-            {
-              F_ADD(IOQueue,CurrentProc);
-            }
-          else if((Sim->Time >0 ) && !(CurrentProc->CPU_BURST == CurrentProc->CPU_Duration))
-            {
-              F_ADD(ReadyQueue,CurrentProc);
-            }
+              //checks if it needs to go in the IO
+              if((CurrentProc->IO_BURST > 0) && (CurrentProc->CPU_BURST/2 == CurrentProc->CPU_Duration))
+                {
+                  F_ADD(IOQueue,CurrentProc);
+                }
+              else if((Sim->Time >0 ) && !(CurrentProc->CPU_BURST == CurrentProc->CPU_Duration))
+                {
+                  F_ADD(ReadyQueue,CurrentProc);
+                }
 
-          DispBurst(F_ATProc(ReadyQueue,0));
+              if((!F_Empty(ReadyQueue)))
+                {
+                  DispBurst(F_ATProc(ReadyQueue,0));
+                }
 
           printf("current state of ready queue: ");
           F_DisplayContent(ReadyQueue);
           printf("\n");
 
           CurrentProc = F_DEL(ReadyQueue);
-
-//                if(Sim->Time == 10)
-//        {
-//          F_ListProc(ReadyQueue);
-//          F_ListProc(IOQueue);
-//        }
 
 
           TimeQ=1;
@@ -103,23 +101,30 @@ void RoundRobin(PROCESS Proc[], SIMULATION *Sim, int TimeQuantum)
         }
 
 
-    //F_CheckIO(IOQueue, ReadyQueue, Complete, Sim);
+      //F_CheckIO(IOQueue, ReadyQueue, Complete, Sim);
 
       //runsIO
-      if(!F_RunIO(IOQueue, ReadyQueue, Sim))
-        {
-          printf("current state of device queue: ");
-          F_DisplayContent(IOQueue);
-          printf("\n");
-        }
+      //if(!F_RunIO(IOQueue, ReadyQueue, Sim))
+      {
+        printf("current state of device queue: ");
+        F_DisplayContent(IOQueue);
+        printf("\n");
+      }
 
 
 
 
       Sim->Time++;
 
+              if(Sim->Time == 80)
+        {
+          F_ListProc(ReadyQueue);
+          F_ListProc(IOQueue);
+          return;
+        }
+
     }
-    printf("Exiting\n");
+  printf("Exiting\n");
 
 
 

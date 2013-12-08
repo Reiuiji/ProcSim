@@ -296,7 +296,6 @@ bool RunCPU(PROCESS Proc[], SIMULATION *SIM)//run based on the Current Ready Que
                   }
               }
 
-
             for( pos=0; pos<SIM->TotalProc; pos++)//check each Process to see
               {
                 if(Proc[pos].P_ID == NextProc) //search to find which Process it is serving
@@ -305,9 +304,15 @@ bool RunCPU(PROCESS Proc[], SIMULATION *SIM)//run based on the Current Ready Que
                     break; //found the next process to work on
                   }
               }
-            if(Proc[NextProc].P_ID != SIM->CPU_Current)
+            if((Proc[NextProc].P_ID != SIM->CPU_Current))
               {
-                //Proc[NextProc]
+                  if(!((Proc[NextProc].CPU_BURST - Proc[NextProc].CPU_Duration) == (Proc[CPUPIDtoPOS(Proc, SIM)].CPU_BURST - Proc[CPUPIDtoPOS(Proc, SIM)].CPU_Duration) &&
+               (Proc[NextProc].P_ID > SIM->CPU_Current)))
+               {
+                ListProcess(Proc, SIM);
+                ListSim(SIM);
+
+
                 if(SIM->Time%SIM->TimeInterval == 0)
                   {
                     printf("\nt = %i\n",SIM->Time);
@@ -315,10 +320,14 @@ bool RunCPU(PROCESS Proc[], SIMULATION *SIM)//run based on the Current Ready Que
                     printf("CPU loading job %i: CPU burst(%i) IO burst(%i)\n", Proc[NextProc].P_ID, Proc[NextProc].CPU_BURST-Proc[NextProc].CPU_Duration, Proc[NextProc].IO_BURST-Proc[NextProc].IO_Duration);
                     PcheckOccurs = true;
                   }
+
                 Proc[Current].Waiting = true;
+                Proc[Current].WaitTime--;
                 Proc[NextProc].Waiting = false;
+                Proc[NextProc].WaitTime++;
                 SIM->CPU_Current = Proc[NextProc].P_ID;
                 SeqAdd(SIM);
+               }
               }
           }
         }

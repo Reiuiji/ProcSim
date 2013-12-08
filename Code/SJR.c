@@ -30,11 +30,6 @@ int SJR(PROCESS Proc[], SIMULATION *Sim)
     {
         //PCheckSort(Proc, Sim);
         SJRSort(Proc, Sim);
-if(Sim->Time == 2)
-{
-    ListProcess(Proc, Sim);
-    ListSim(Sim);
-}
         RunCPU(Proc, Sim); // Simulates a running of the CPU
         RunIO(Proc, Sim); // Simulates a running of the IO
 

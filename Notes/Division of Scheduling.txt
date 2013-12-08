@@ -1,5 +1,5 @@
 [X] SJF -> Ben
-[ ] SJR -> Ben
+[X] SJR -> Ben
 [ ] FCFS -> Keith
 [ ] MFQ  -> Keith, Help from Dan w/ RR
 [ ] PS -> Dan

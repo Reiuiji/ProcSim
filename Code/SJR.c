@@ -30,7 +30,7 @@ int SJR(PROCESS Proc[], SIMULATION *Sim)
     {
         //PCheckSort(Proc, Sim);
         SJRSort(Proc, Sim);
-if(Sim->Time == 50)
+if(Sim->Time == 2)
 {
     ListProcess(Proc, Sim);
     ListSim(Sim);

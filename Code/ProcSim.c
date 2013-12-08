@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     //FCFS(Proc, SIMINFO);
     //PS(Proc,SIMINFO);
     //SJF(Proc, SIMINFO);
-    SJR(Proc, SIMINFO);
+    FCFS(Proc, SIMINFO);
 
     if(test == true)
     {

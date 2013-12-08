@@ -292,7 +292,6 @@ bool RunCPU(PROCESS Proc[], SIMULATION *SIM)//run based on the Current Ready Que
                     if(Proc[pos].P_ID == SIM->CPU_Current) //search to find which Process it is serving
                     {
                         Current = pos;
-                        //Proc[pos].Waiting = false;
                         break; //found the next process to work on
                     }
                 }
@@ -303,7 +302,6 @@ bool RunCPU(PROCESS Proc[], SIMULATION *SIM)//run based on the Current Ready Que
                     if(Proc[pos].P_ID == NextProc) //search to find which Process it is serving
                     {
                         NextProc = pos;
-                        //Proc[pos].Waiting = false;
                         break; //found the next process to work on
                     }
                 }
@@ -332,12 +330,11 @@ bool RunCPU(PROCESS Proc[], SIMULATION *SIM)//run based on the Current Ready Que
         {
             Current = pos;
             Proc[pos].Waiting = false;
-            // Proc[Current].InCPU == true;//indicates it is in the CPU
             break; //found the next process to work on
         }
     }
-
     //increment the WaitTime for Process not in CPU
+    //ListProcess(Proc,SIM);
     for( pos=0; pos<SIM->TotalProc; pos++)
     {
         if((SIM->Time > 0) && (Proc[pos].Waiting == true)&& (Proc[pos].IO_Duration == 0))
@@ -349,6 +346,7 @@ bool RunCPU(PROCESS Proc[], SIMULATION *SIM)//run based on the Current Ready Que
             Proc[pos].WaitTime++;
         }
     }
+    //ListProcess(Proc,SIM);
     //output the time line for the snapshot
     if((SIM->Time%SIM->TimeInterval == 0) && (PcheckOccurs == false))
     {

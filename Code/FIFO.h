@@ -3,6 +3,7 @@
 
 //For Boolean
 #include <stdbool.h>
+#include "ProcUtil.h"
 
 typedef struct fnode
 {
@@ -27,6 +28,14 @@ void*  F_Rear (FIFO* fifo);//returns what is in rear
 int   F_Count(FIFO* fifo);//return how many
 bool  F_Empty(FIFO* fifo);//check if empty
 bool  F_Full (FIFO* fifo);//check if full
+
+
 void* F_AT(FIFO* fifo, int at);//return what is at a specific spot
+void* F_DELAT(FIFO* fifo, int at);//remove what is at a specific spot
+PROCESS* F_ATProc(FIFO* fifo, int at);
+//Functions
+//FIFO Proc Import
+FIFO* F_PImport(PROCESS Proc[], SIMULATION *Sim);
+void F_ListProc(FIFO *fifo);
 
 #endif

@@ -738,45 +738,105 @@ void SortPID(PROCESS Proc[],SIMULATION *SIM)
 
 void PCheckSort(PROCESS Proc[], SIMULATION *SIM)
 {
-    if(SIM->CPU_Current == -1)
-    {
-        return;
-    }
-    int Current = CPUPIDtoPOS(Proc, SIM);
-    int Next = NextQueue(Proc, SIM);//return position of next CPU
-    if(Next == -1)
-    {
-        return; //There is no easter bunny. no more
-    }
+	// This is the "I give up, if you're going to play this game, let's play." workaround for CPU sort.
+	int CPUproc = -1, NEXTproc, CPUBurstC, CPUBurstN, CPUBursti, CPUBurstj, smburst = -1, i,j;
 
-    int CPUBurst1, CPUBurst2;
-    if((Proc[Current].IO_BURST > 0))
-    {
-        CPUBurst1 = Proc[Current].CPU_WITH_IO;
-    }
-    else
-    {
-        CPUBurst1 = Proc[Current].CPU_BURST;
-    }
-    CPUBurst1-=Proc[Current].CPU_Duration;
+        // Attempts to check what process is in the CPU. Fails.
+		for(i=0; i<SIM->TotalProc; i++)
+		{
+			if((Proc[i].InCPU == true))
+			{
+				CPUproc = i;
+				i = SIM->TotalProc;
+			}
+		}
 
-    if((Proc[Next].IO_BURST > 0))
-    {
-        CPUBurst2 = Proc[Next].CPU_WITH_IO;
-    }
-    else
-    {
-        CPUBurst2 = Proc[Next].CPU_BURST;
-    }
-    CPUBurst2-=Proc[Next].CPU_Duration;
+        printf("The Process in the CPU is: %d\n", Proc[CPUproc].P_ID);
+        printf("It's remaining burst time is: %d\n", Proc[CPUproc].CPU_BURST - Proc[CPUproc].CPU_Duration);
 
-    if(CPUBurst1 > CPUBurst2)
-    {
-        PROCESS tmp = Proc[Current];
-        Proc[Current] = Proc[Next];
-        Proc[Next] = tmp;
-        SIM->CPU_Current = Proc[Current].P_ID;
-    }
+        // Attempts to find the smallest CPU burst among the non-CPU, non-io processes. Fails.
+		for(i=0; i<SIM->TotalProc; i++)
+		{
+			for(j=0; j<SIM->TotalProc; j++)
+			{
+				if((i != j) && (Proc[i].CPU_BURST > 0) && (Proc[j].CPU_BURST > 0) && (Proc[i].ReadyQueue == true) && (Proc[j].ReadyQueue == true))
+				{
+					if((Proc[i].IO_BURST) > 0)
+					{
+						CPUBursti = Proc[i].CPU_WITH_IO;
+					}
+					else
+					{
+						CPUBursti = Proc[i].CPU_BURST;
+					}
 
+					CPUBursti -= Proc[i].CPU_Duration;
+
+					if((Proc[j].IO_BURST) > 0)
+					{
+						CPUBurstj = Proc[j].CPU_WITH_IO;
+					}
+					else
+					{
+						CPUBurstj = Proc[j].CPU_BURST;
+					}
+
+					CPUBurstj -= Proc[j].CPU_Duration;
+
+					if(CPUBursti > CPUBurstj)
+					{
+						smburst = j;
+					}
+					else if(CPUBursti < CPUBurstj)
+					{
+						smburst = i;
+					}
+					else
+					{
+						smburst = i;
+					}
+				}
+			}
+		}
+        printf("The smallest burst is process %d\n", Proc[smburst].P_ID);
+        printf("It's remaining burst time is: %d\n", Proc[smburst].CPU_BURST - Proc[smburst].CPU_Duration);
+
+        // If they both exits (this never works)
+		if((CPUproc != -1) && (smburst != -1))
+		{
+            // Checks to see when to use w/io burst times
+			if((Proc[CPUproc].IO_BURST) > 0)
+			{
+				CPUBurstC = Proc[CPUproc].CPU_WITH_IO;
+			}
+			else
+			{
+				CPUBurstC = Proc[CPUproc].CPU_BURST;
+			}
+            // Subtracts the duration
+			CPUBurstC -= Proc[CPUproc].CPU_Duration;
+
+            // same as above
+			if((Proc[smburst].IO_BURST) > 0)
+			{
+				CPUBurstN = Proc[smburst].CPU_WITH_IO;
+			}
+			else
+			{
+				CPUBurstN = Proc[smburst].CPU_BURST;
+			}
+            // ...
+			CPUBurstN -= Proc[CPUproc].CPU_Duration;
+
+            // swaps
+	   		if(CPUBurstC > CPUBurstN)
+	    		{
+	        		PROCESS tmp = Proc[CPUproc];
+	        		Proc[CPUproc] = Proc[smburst];
+	        		Proc[smburst] = tmp;
+
+	        		SIM->CPU_Current = Proc[CPUproc].P_ID;
+	    		}
+		}
     return;
 }

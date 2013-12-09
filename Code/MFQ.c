@@ -15,6 +15,9 @@
 int MFQ(PROCESS Proc[], SIMULATION *Sim);
 void MFQSort(PROCESS Proc[], SIMULATION *Sim);
 void IO_MFQ(PROCESS Proc[], SIMULATION *Sim);
+FIFO* Queue1;
+FIFO* Queue2;
+FIFO* Queue3;
 /*Getting burst times from ReadyQueue
 Get divide into three queues as a result
 Place processes with burst time>3 on queue 1
@@ -43,7 +46,7 @@ int MFQ(PROCESS Proc[], SIMULATION *Sim)
 int i;
     while(IsProcComplete(Proc, Sim))
     {
-        FCFSSort(Proc, Sim);
+        MFQSort(Proc, Sim);
 
         //IO_SJF(Proc, Sim);
         RunCPU(Proc, Sim);
@@ -75,18 +78,20 @@ void MFQSort(PROCESS Proc[], SIMULATION *Sim)
             if((Proc[i].CPU_BURST<=3)&&(Proc[i+1].IO_BURST >= 1))
             {
               //Place Proc[i] on queue1
+               F_ADD(Queue1,Proc[i]);
                     
 
             }
             else if((Proc[i].CPU_BURST<=8)&&(Proc[i].CPU_BURST>3)&&(Proc[i+1].IO_BURST >= 1))
             {
               //Place Proc[i] on queue2
-                    
+              F_ADD(Queue2,Proc[i]);      
 
             }
             else if((Proc[i].CPU_BURST>8)&&(Proc[i+1].IO_BURST >= 1))
             {
               //Place Proc[i] on queue3
+              F_ADD(Queue3,Proc[i]);
                      
             }
             
@@ -97,7 +102,10 @@ void MFQSort(PROCESS Proc[], SIMULATION *Sim)
         }
         
         //Round Robin call for queue1 and queue2
+        RoundRobin(Queue1, *SIM, 3);
+        RoundRobin(Queue2, *SIM, 3);
         //FCFS call for queue 3
+        FCFS(Queue3, *SIM);
         //Concatenate all 3 queues
     }
 

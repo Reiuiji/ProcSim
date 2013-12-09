@@ -44,11 +44,21 @@ void RoundRobin(PROCESS Proc[], SIMULATION *Sim, int TimeQuantum)
         {
           Sim->CPU_Idle++;
         }
+        if((F_Empty(ReadyQueue)) && (CurrentProc != NULL))
+        {
+            if(CurrentProc->CPU_BURST <= (CurrentProc->CPU_Duration ))
+            {
+                CurrentProc->TurnAroundTime = Sim->Time;
+                F_ADD(Complete,CurrentProc);
+                break;
+            }
+        }
 
       if(Sim->Time%Sim->TimeInterval == 0)
         {
           printf("\nt = %i\n",Sim->Time);
         }
+
 
       //Reset the CPU if the it hits the TimeQuantum or reached its CPU Burst
 
@@ -68,6 +78,7 @@ void RoundRobin(PROCESS Proc[], SIMULATION *Sim, int TimeQuantum)
               if(CurrentProc->CPU_BURST == CurrentProc->CPU_Duration)
                 {
                   printf("JOB %i DONE\n", CurrentProc->P_ID);
+                  CurrentProc->TurnAroundTime = Sim->Time;
                   F_ADD(Complete,CurrentProc);
 
                 }
@@ -77,12 +88,25 @@ void RoundRobin(PROCESS Proc[], SIMULATION *Sim, int TimeQuantum)
                   if(Sim->Time%Sim->TimeInterval == 0)
                     {
                       printf("JOB %i finished CPU burst\n",CurrentProc->P_ID);
+
                     }
                 }
 
               if(((Sim->Time%Sim->TimeInterval) == 0) )
                 {
-                  printf("CPU loading job %i: ",F_ATProc(ReadyQueue,0)->P_ID);
+                    if(!F_Empty(ReadyQueue))
+                    {
+                        printf("CPU loading job %i: ",F_ATProc(ReadyQueue,0)->P_ID);
+                        //PROCESS* dataPtr = F_ATProc(ReadyQueue,5);
+                        //    printf("AT 5: %i\n",dataPtr->P_ID);
+                    }
+                    else
+                    {
+                        printf("CPU loading job %i: ",CurrentProc->P_ID);
+                        //F_SeqAdd(CurrentProc->P_ID, Sim);
+                    }
+
+
                 }
 
               //checks if it needs to go in the IO
@@ -150,9 +174,6 @@ void RoundRobin(PROCESS Proc[], SIMULATION *Sim, int TimeQuantum)
       Sim->Time++;
 
     }
-  printf("Exiting\n");
-
-
 
 // Test functions
 //    PROCESS* dataPtr = F_ATProc(ReadyQueue,5);
@@ -165,14 +186,14 @@ void RoundRobin(PROCESS Proc[], SIMULATION *Sim, int TimeQuantum)
 //    F_ListProc(ReadyQueue);
 //}
   //F_ADD(ReadyQueue,CurrentProc);
-  printf("Ready Queue:\n");
-  F_ListProc(ReadyQueue);
-  printf("Device Queue:\n");
-  F_ListProc(IOQueue);
-  printf("Complete:\n");
-  F_ListProc(Complete);
+//  printf("Ready Queue:\n");
+//  F_ListProc(ReadyQueue);
+//  printf("Device Queue:\n");
+//  F_ListProc(IOQueue);
+  //printf("Complete:\n");
+ // F_ListProc(Complete);
 
-
+F_FinalReport(Complete, Sim);
 
 //Exiting the RR
   F_Destroy(Complete);

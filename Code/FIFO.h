@@ -37,5 +37,9 @@ PROCESS* F_ATProc(FIFO* fifo, int at);
 //FIFO Proc Import
 FIFO* F_PImport(PROCESS Proc[], SIMULATION *Sim);
 void F_ListProc(FIFO *fifo);
+PROCESS* F_TO_Proc(FIFO* fifo);
+void F_FinalReport(FIFO* fifo,SIMULATION *SIM);
+
+void F_SeqAdd(int PID, SIMULATION *SIM);
 
 #endif

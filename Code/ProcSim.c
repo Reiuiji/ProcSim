@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
     SIMINFO->TimeInterval = atoi(argv[3]);
     SIMINFO->PCheck = false;
 
-    sprintf(SIMINFO->SeqOfProc, " ");
+    sprintf(SIMINFO->SeqOfProc, ":");
     PROCESS Proc[SIMINFO->TotalProc];
     SIMINFO->RQProc = InputFromFile(Proc,DATA);
     SIMINFO->IOProc = 0;
@@ -41,12 +41,12 @@ int main(int argc, char *argv[])
 
 //just uncomment what function you need
 
-    //FCFS(Proc, SIMINFO);
+    FCFS(Proc, SIMINFO);
     //PS(Proc,SIMINFO);
     //SJR(Proc, SIMINFO);
     //SJF(Proc, SIMINFO);
     //FCFS(Proc, SIMINFO);
-    RR(Proc, SIMINFO);
+    //RR(Proc, SIMINFO);
 
 
     if(test == true)

@@ -252,7 +252,7 @@ FIFO* F_PImport(PROCESS Proc[], SIMULATION *Sim)
 void F_ListProc(FIFO *fifo)
 {
   int pos;
-  bool FullDisplay = false;
+  bool FullDisplay = true;
   PROCESS* dataPtr;
 
   if(FullDisplay == false)
@@ -262,10 +262,10 @@ void F_ListProc(FIFO *fifo)
       for(pos = 0; pos < fifo->count; pos++)
         {
           dataPtr = F_ATProc(fifo,pos);
-        if(dataPtr != NULL)
-        {
-          printf("| %-7i | %-7i | %-7i | %-7i |\n", dataPtr->P_ID, dataPtr->CPU_BURST, dataPtr->IO_BURST, dataPtr->PRIORITY);
-        }
+          if(dataPtr != NULL)
+            {
+              printf("| %-7i | %-7i | %-7i | %-7i |\n", dataPtr->P_ID, dataPtr->CPU_BURST, dataPtr->IO_BURST, dataPtr->PRIORITY);
+            }
 
         }
       printf("+---------+---------+---------+---------+\n");
@@ -503,240 +503,27 @@ void F_CheckIO(FIFO* IOQue, FIFO* ReadyQue, FIFO* Complete, SIMULATION *Sim)
     }
 }
 
+void F_FinalReport(FIFO* fifo,SIMULATION *SIM)
+{
+  //Sort the Array by PID
+  int pos;
+  PROCESS Proc[fifo->count];
 
-//bool F_RunCPU(FIFO* IOQue, FIFO* ReadyQue, SIMULATION *Sim)
-//{
-//  int pos;
-//  bool PcheckOccurs = false;//indicate that pcheck changed the order
-//  int Current = -1;//-1 acts as a error if the next for cant find the process
-//
-//  if(!F_Empty(ReadyQue))//returns false since there is no more CPU so it is finished
-//    {
-//
-//      if(SIM->Time%SIM->TimeInterval == 0)
-//        {
-//          printf("\nt = %i\n",SIM->Time);
-//          printf("CPU WAITING...\n");
-//          F_DisplayContent(ReadyQue);
-//        }
-//        Sim->CPU_Idle++;//increment the idle time
-//      return false;
-//    }
-//
-//  if(SIM->PCheck == true)
-//    {
-//      if(SIM->IOJFinished != -1)
-//        {
-//
-//          if(SIM->CPU_Current/*PID*/ != NextQueue(Proc,SIM)/*PID*/);//checks if it needs to switch the current CPU
-//          {
-//            int NextProc = NextQueue(Proc,SIM);
-//            //printf("NextQueue= %i\n",NextQueue(Proc,SIM));
-//
-//            for( pos=0; pos<SIM->TotalProc; pos++)//check each Process to see
-//              {
-//                if(Proc[pos].P_ID == SIM->CPU_Current) //search to find which Process it is serving
-//                  {
-//                    Current = pos;
-//                    break; //found the next process to work on
-//                  }
-//              }
-//
-//
-//            for( pos=0; pos<SIM->TotalProc; pos++)//check each Process to see
-//              {
-//                if(Proc[pos].P_ID == NextProc) //search to find which Process it is serving
-//                  {
-//                    NextProc = pos;
-//                    break; //found the next process to work on
-//                  }
-//              }
-//            if(Proc[NextProc].P_ID != SIM->CPU_Current)
-//              {
-//                //Proc[NextProc]
-//                if(SIM->Time%SIM->TimeInterval == 0)
-//                  {
-//                    printf("\nt = %i\n",SIM->Time);
-//                    printf("JOB %i finished CPU burst\n", SIM->CPU_Current);
-//                    printf("CPU loading job %i: CPU burst(%i) IO burst(%i)\n", Proc[NextProc].P_ID, Proc[NextProc].CPU_BURST-Proc[NextProc].CPU_Duration, Proc[NextProc].IO_BURST-Proc[NextProc].IO_Duration);
-//                    PcheckOccurs = true;
-//                  }
-//                Proc[Current].Waiting = true;
-//                Proc[NextProc].Waiting = false;
-//                SIM->CPU_Current = Proc[NextProc].P_ID;
-//                SeqAdd(SIM);
-//              }
-//          }
-//        }
-//    }
-//
-//
-//  //increment the WaitTime for Process not in CPU
-// F_Wait(ReadyQue);
-//
-//
-//  //output the time line for the snapshot
-//  if((SIM->Time%SIM->TimeInterval == 0) && (PcheckOccurs == false))
-//    {
-//      printf("\nt = %i\n",SIM->Time);
-//
-//    }
-//
-//  if(SIM->Time == 0)//indicates start of simulation
-//    {
-//
-//      int CPUBurstI;
-//      if(((F_ATProc(ReadyQue, pos))->IO_Duration == 0) && ((F_ATProc(ReadyQue, pos))->IO_BURST > 0))
-//        {
-//          CPUBurstI = (F_ATProc(ReadyQue, pos))->CPU_WITH_IO;
-//        }
-//      else
-//        {
-//          CPUBurstI = (F_ATProc(ReadyQue, pos))->CPU_BURST;
-//        }
-//      if(SIM->Time%SIM->TimeInterval == 0)
-//        {
-//          printf("CPU loading job %i : CPU burst (%i) IO burst (%i) \n",(F_ATProc(ReadyQue, pos))->P_ID, CPUBurstI, (F_ATProc(ReadyQue, pos))->IO_BURST - (F_ATProc(ReadyQue, pos))->IO_Duration);
-//        }
-//      SeqAdd(SIM);
-//    }
-//
-//
-//
-//  // Checks the process data if this is it first time in the CPU
-//  if(Proc[Current].CPU_Duration == 1)
-//    {
-//      Proc[Current].ResponseTime = SIM->Time;
-//    }
-//
-//
-//  // Checks the process data. If there's a program that has finished its CPU burst but needs to finish its IO, it moves it to the device queue.
-//  if((Proc[Current].CPU_Duration >= Proc[Current].CPU_WITH_IO) && (Proc[Current].IO_BURST > Proc[Current].IO_Duration))
-//    {
-//      Proc[Current].DeviceQueue = true; //Added to the Device Queue
-//      SIM->IOProc++;
-//      Proc[Current].ReadyQueue = false; //removed from the readyQueue
-//      SIM->RQProc--;
-//      Proc[Current].InCPU = false;
-//
-//      if(SIM->RQProc == 0)
-//        {
-//          SIM->CPU_Idle++;
-//        }
-//
-//      if((SIM->Time%SIM->TimeInterval == 0) && (PcheckOccurs == false))
-//        {
-//          if(SIM->RQProc == 0)
-//            {
-//              printf("CPU WAITING...\n");
-//            }
-//          else
-//            {
-//              printf("JOB %i finished CPU burst\n",Proc[Current].P_ID);
-//            }
-//        }
-//
-//      SIM->CPU_Current = NextQueue(Proc, SIM);//grabs the next on the queue
-//
-//      Current = CPUPIDtoPOS(Proc, SIM);
-//      if(Current == -1)
-//        {
-//          if(SIM->Time%SIM->TimeInterval == 0)
-//            {
-//              DisplayReadyQueue(Proc, SIM);
-//            }
-//          return false;
-//        }
-//      int CPUBurst;
-//      if((Proc[Current].IO_Duration == 0) && (Proc[Current].IO_BURST > 0))
-//        {
-//          CPUBurst = Proc[Current].CPU_WITH_IO;
-//        }
-//      else
-//        {
-//          CPUBurst = Proc[Current].CPU_BURST;
-//        }
-//      if(SIM->Time%SIM->TimeInterval == 0 && (PcheckOccurs == false))
-//        {
-//          printf("CPU loading job %i: CPU burst(%i) IO burst(%i)\n",Proc[Current].P_ID, CPUBurst-Proc[Current].CPU_Duration, Proc[Current].IO_BURST-Proc[Current].IO_Duration);
-//        }
-//      SeqAdd(SIM);
-//    }
-//
-//  // Checks the process data. If there's a program that has finished its CPU burst and has finished its IO burst, it gets removed.
-//  else if((Proc[Current].CPU_Duration == Proc[Current].CPU_BURST) && (Proc[Current].IO_Duration == Proc[Current].IO_BURST ))//(LOADED_CPU_BURST == 0) && (LOADED_IO_BURST == 0))
-//    {
-//      Proc[Current].ReadyQueue = false;//out of the ready que
-//      SIM->RQProc--;
-//      Proc[Current].FinishTime = SIM->Time; // sets the time when the Process finishes
-//      Proc[Current].TurnAroundTime = SIM->Time;
-//      Proc[Current].Complete = true;//yay the process is finished
-//
-//      if(SIM->Time%SIM->TimeInterval == 0)
-//        {
-//          printf("JOB %i DONE\n",Proc[Current].P_ID);
-//        }
-//
-//      SIM->CPU_Current = NextQueue(Proc, SIM);//grabs the next on the queue
-//
-//      Current = CPUPIDtoPOS(Proc, SIM);
-//
-//      int CPUBurst;
-//      if((Proc[Current].IO_Duration == 0) && (Proc[Current].IO_BURST > 0))
-//        {
-//          CPUBurst = Proc[Current].CPU_WITH_IO;
-//        }
-//      else
-//        {
-//          CPUBurst = Proc[Current].CPU_BURST;
-//        }
-//
-//      if(SIM->Time%SIM->TimeInterval == 0)
-//        {
-//          printf("CPU loading job %i: CPU burst(%i) IO burst(%i)\n",Proc[Current].P_ID, CPUBurst-Proc[Current].CPU_Duration, Proc[Current].IO_BURST-Proc[Current].IO_Duration);
-//        }
-//      SeqAdd(SIM);
-//    }
-//  else
-//    {
-//
-//      int CPUBurst;
-//      if((Proc[Current].IO_Duration == 0) && (Proc[Current].IO_BURST > 0))
-//        {
-//          CPUBurst = Proc[Current].CPU_WITH_IO;
-//        }
-//      else
-//        {
-//          CPUBurst = Proc[Current].CPU_BURST;
-//        }
-//      if((SIM->Time%SIM->TimeInterval == 0) && (SIM->Time != 0) && (PcheckOccurs == false))
-//        {
-//          printf("Servicing %s job %i: CPU burst(%i) IO burst(%i)\n",SIM->Schedule, Proc[Current].P_ID, CPUBurst - Proc[Current].CPU_Duration, Proc[Current].IO_BURST - Proc[Current].IO_Duration );
-//        }
-//      if(SIM->Time%SIM->TimeInterval == 0)
-//        {
-//          Proc[Current].ReadyQueue = false;//quick and dirty way to make the display ready queue will not output the Process it is serving
-//          DisplayReadyQueue(Proc, SIM);
-//          Proc[Current].ReadyQueue = true;
-//        }
-//
-//      Proc[Current].CPU_Duration++;
-//      return true;
-//
-//
-//    }
-//
-//  if(SIM->Time%SIM->TimeInterval == 0)
-//    {
-//      DisplayReadyQueue(Proc, SIM);
-//    }
-//
-//  // Otherwise it should be in a situation where it just needs to run normally.
-//
-//  //Does all what it needs for the Current Process
-//  Proc[Current].CPU_Duration++;
-//
-//  return true;
-//}
-//
-//
+  for(pos = 0; pos < fifo->count; pos++)
+  {
+    Proc[pos] = *F_ATProc(fifo,pos);
+  }
+  FinalReport(Proc,SIM);
+}
+
+void F_SeqAdd(int PID, SIMULATION *SIM)
+{
+  char TMP[5];
+  int CPU_ID = PID;
+  if(strcmp(SIM->SeqOfProc," ") == 0)
+    sprintf(TMP,"%i",CPU_ID);
+  else
+    sprintf(TMP,"-%i",CPU_ID);
+
+  strcat(SIM->SeqOfProc,TMP);
+}

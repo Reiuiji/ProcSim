@@ -61,7 +61,7 @@ int FCFS(PROCESS Proc[], SIMULATION *Sim)
 
 void FCFSSort(PROCESS Proc[], SIMULATION *Sim)
 {
-    int i, j, Total = Sim->TotalProc;
+    int i, j, k, m, n, Total = Sim->TotalProc;
 
     for(i=0; i < Total-1; i++)
     {
@@ -74,8 +74,15 @@ void FCFSSort(PROCESS Proc[], SIMULATION *Sim)
                     PROCESS tmp = Proc[j];
                     Proc[j] = Proc[j+1];
                     Proc[j+1] = tmp;
-
+                    
             }
+          /*  m=Proc[ARRAY_SIZE(proc[])];
+            n=Proc[0];
+            for(k=m-1;k=m+n;k++){
+            Proc[k]=???
+            }
+            
+            */
             else if(Proc[j].P_ID==Proc[j+1].P_ID){
             printf("Two different processes cannot have the same ID number!!! \n");
             }

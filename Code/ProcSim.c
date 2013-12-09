@@ -4,14 +4,26 @@
 int main(int argc, char *argv[])
 {
     //set the variables
-    int Select;
+    int Select = 0;
     bool INTERACTIVE = false;
     bool test = false;
     SIMULATION* SIMINFO;
     FILE *DATA;
-    if(argc !=4)
+    if(argc !=5)
     {
-        printf("ProcSim <Input File> <Num of Processes> <Snapshot Time Interval>\n");
+        printf("+===================================+\n");
+        printf("|              ProcSim              |\n");
+        printf("|===================================|\n");
+        printf("|  What type of simulation?         |\n");
+        printf("|----+------------------------------|\n");
+        printf("|  1 |  First Come First Server     |\n");
+        printf("|  2 |  Shortest Job First          |\n");
+        printf("|  3 |  Shortest Job Remaining      |\n");
+        printf("|  4 |  Round-Robin                 |\n");
+        printf("|  5 |  Priority                    |\n");
+        printf("|----|--Multi-level Feedback Queue  |\n");
+        printf("+----+------------------------------+\n\n\n\n");
+        printf("ProcSim <Input File> <Num of Processes> <Snapshot Time Interval> <Select>\n");
         return -1;
     }
 
@@ -21,6 +33,8 @@ int main(int argc, char *argv[])
         printf("I am going to skip the inputing from a file");
         exit(0);
     }
+
+    Select = atoi(argv[4]);
 
 //setup the Data
     SIMINFO= (SIMULATION*) malloc (sizeof (SIMULATION));
@@ -41,12 +55,30 @@ int main(int argc, char *argv[])
 
 //just uncomment what function you need
 
+if(Select == 1)
+{
     FCFS(Proc, SIMINFO);
-    //PS(Proc,SIMINFO);
-    //SJR(Proc, SIMINFO);
-    //SJF(Proc, SIMINFO);
-    //FCFS(Proc, SIMINFO);
-    //RR(Proc, SIMINFO);
+}
+if(Select == 2)
+{
+    SJF(Proc, SIMINFO);
+}
+if(Select == 3)
+{
+    SJR(Proc, SIMINFO);
+}
+if(Select == 4)
+{
+    RR(Proc, SIMINFO);
+}
+if(Select == 5)
+{
+    PS(Proc,SIMINFO);
+}
+if(Select == 6)
+{
+    //Not Implemented
+}
 
 
     if(test == true)

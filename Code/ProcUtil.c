@@ -309,8 +309,8 @@ bool RunCPU(PROCESS Proc[], SIMULATION *SIM)//run based on the Current Ready Que
                   if(!((Proc[NextProc].CPU_BURST - Proc[NextProc].CPU_Duration) == (Proc[CPUPIDtoPOS(Proc, SIM)].CPU_BURST - Proc[CPUPIDtoPOS(Proc, SIM)].CPU_Duration) &&
                (Proc[NextProc].P_ID > SIM->CPU_Current)))
                {
-                ListProcess(Proc, SIM);
-                ListSim(SIM);
+                //ListProcess(Proc, SIM);
+                //ListSim(SIM);
 
 
                 if(SIM->Time%SIM->TimeInterval == 0)

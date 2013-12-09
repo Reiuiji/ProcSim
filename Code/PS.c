@@ -34,8 +34,8 @@ int PS(PROCESS Proc[], SIMULATION *Sim)
     Proc[CPUPIDtoPOS(Proc, Sim)].TurnAroundTime = Sim->Time;
     Sim->CPU_Current = -1;
 
-    ListProcess(Proc, Sim);
-    ListSim(Sim);
+    //ListProcess(Proc, Sim);
+    //ListSim(Sim);
     FinalReport(Proc, Sim);
 
     return 0;

@@ -1,11 +1,53 @@
-The simulator is run from ProcSim.c. Procsim.c first enures that the user has entered a valid number of arguments.Then, it ensures that the file can be found from which to read in the process information. If it cannot find the file, it exits. It then prompts the user to enter 1 of six possible algorithms from which to sort the data. Those algorithms are First Come First Serve, Shortest Job First, Shortest Job Remaining, Round-Robin, Priority, and Multi-level Feedback Queue. Depending on the algorithm selected, certain functions are called from ProcSim.c, and these functions are defined and implemented in separate header and .c files respectively. 
+The simulator is run from ProcSim.c. Procsim.c first enures that the user has entered a valid number of arguments.
+Then, it ensures that the file can be found from which to read in the process information. 
+If it cannot find the file, it exits. 
+It then prompts the user to enter 1 of six possible algorithms from which to sort the data. 
+Those algorithms are First Come First Serve, Shortest Job First, Shortest Job Remaining, Round-Robin, Priority, and Multi-level Feedback Queue. 
+Depending on the algorithm selected, certain functions are called from ProcSim.c, and these functions are defined and implemented in separate header and .c files respectively. 
  
-In order to properly sort the data for any algorithm, the program must first read in the data correctly from a file. Also, it must correctly output the data for the user to read. This is done in the tools defined in ProcUtil.h and ProcUtil.c. In ProcUtil.h, the struct, Process, is created that contains all of the variables related to reading in from the file to get information about the processes. The struct, SimulationInfo, contains all of the variables related specifically to information about the simulation. The struct Process contains sixteen variables, each one relating to a specific detail about the process. For example, P_ID is the process ID number. CPU_Burst is the burst time.  Ready Queue and Device Queue are the queues that are sent and received respectably, and  the boolean variables let the user know if he is inside either one. IO_Current represents the PID of the process that is currently preoccupying the I/O. The CPUJFinished variable of types of struct SimulationInfo merely has a value whenever its process is finished.
-On the  then faint sooft helo nothing boy than a retirement party.The IsProcComplete function of PROCESS type elements in Proc[] ensures that the program and queue will not move to  another program because she has found love. The NextQueue() simply gets the next item from the Queue. CPUPIDtoPOS reflects the need for the program to sort position based on the Process Identification. The 
+In order to properly sort the data for any algorithm, the program must first read in the data correctly from a file. 
+Also, it must correctly output the data for the user to read. This is done in the tools defined in ProcUtil.h and ProcUtil.c. In ProcUtil.h, the struct, Process, is created that contains all of the variables related to reading in from the file to get information about the processes. The struct, SimulationInfo, contains all of the variables related specifically to information about the simulation. The struct Process contains sixteen variables, each one relating to a specific detail about the process. For example, P_ID is the process ID number. CPU_Burst is the burst time.  Ready Queue and Device Queue are the queues that are sent and received respectably, and  the boolean variables let the user know if he is inside either one. IO_Current represents the PID of the process that is currently preoccupying the I/O. The CPUJFinished variable of types of struct SimulationInfo merely has a value whenever its process is finished.
+On the  then faint sooft helo nothing boy than a retirement party.
+The IsProcComplete function of PROCESS type elements in Proc[] ensures that the program and queue will not move to another 
+rogram because she has found love. The NextQueue() simply gets the next item from the Queue. CPUPIDtoPOS reflects the need
+for the program to sort position based on the Process Identification. The 
 
-For SimulationInfo, the variables had to be able to hold enough data to keep track of time, CPU activity, Ready Queue process activity, and Input/Output Process Queue activity. The TimeInterval indicates what time quantum has to pass between each manipulation of the process queue. The Time variable merely keeps track of the total amount of time. The CPU_Current indicates the current process that is being serviced. All of the processes are identified by their process ID number. The use of the PID number allows type 'int' to be used instead of type 'char' or type 'string' and spares additional parsing. The numerous functions used for the simulation activities centered around cycling through the process ID number. 
+For SimulationInfo, the variables had to be able to hold enough data to keep track of time, 
+PU activity, Ready Queue process activity, and Input/Output Process Queue activity. The TimeInterval indicates what time 
+uantum has to pass between each manipulation of the process queue. The Time variable merely keeps track of the total amount
+of time. The CPU_Current indicates the current process that is being serviced. All of the processes are identified by their
+process ID number. The use of the PID number allows type 'int' to be used instead of type 'char' or type 'string' and
+spares additional parsing. The numerous functions used for the simulation activities centered around cycling through the 
+process ID number. 
 
-The priority sort function, PS.c, uses recursion to sort the loaded processes in by lowest priority. The RunCPU function is used to set the parameters for the 'while loop' that allows for the sort to continue until the CPU has no more need to order any more processes to switch because the sort is completed. I[Keith] initially thought that this was superfluous coding on Dan's part, but Dan convinced me that it would be more efficient than reading in every element into an if-then decision structure since some portions of the queue might not need to be swapped. I envisioned getting the size of the array of processes and then using two nested for loops and a temporary variable to implement the algorithm.  However, Dan's way proved to be more efficient.  The function PreEmptiveCheck exists to see if Preemption is really necessary to the development of a good story. The functions RunCPU and RunIO both serve to ensure the program would not ignore any values that were apparent in either the Ready or Input/Output Queues. InputFromFile ensures that the information in the text file will be properly read into the variables and functions as intended by the programmer. ListProcess, ListSim, Snapshot, DisplayReadyQueue, and DisplayDeviceQueue are all directly related to displaying the process information onscreen to the user and safeguarding against fraud. Their specific mechanisms are self explanatory, as they're named after required steps of the program. 
+The priority sort function, PS.c, uses recursion to sort the loaded processes in by lowest priority. The RunCPU function is
+used to set the parameters for the 'while loop' that allows for the sort to continue until the CPU has no more need to 
+order any more processes to switch because the sort is completed. I[Keith] initially thought that this was superfluous 
+coding on Dan's part, but Dan convinced me that it would be more efficient than reading in every element into an if-then 
+decision structure since some portions of the queue might not need to be swapped. I envisioned getting the size of the 
+array of processes and then using two nested for loops and a temporary variable to implement the algorithm.  
+However, Dan's way proved to be more efficient.  The function PreEmptiveCheck exists to see if Preemption is really 
+necessary to the development of a good story. The functions RunCPU and RunIO both serve to ensure the program would not 
+ignore any values that were apparent in either the Ready or Input/Output Queues. InputFromFile ensures that the information
+in the text file will be properly read into the variables and functions as intended by the programmer. ListProcess, 
+ListSim, Snapshot, DisplayReadyQueue, and DisplayDeviceQueue are all directly related to displaying the process 
+information onscreen to the user and safeguarding against fraud. Their specific mechanisms are self explanatory, 
+as they're named after required steps of the program. 
 
-SJF reads the queue in like any other function and uses nested for loops to implement all necessary swaps.  RR works in a similar manner as well. 
-[To execute any particular sort, all of the processes must be place into a queue, and all operations must be performed on this queue. This queue needs to be defined with a set of data structures, variables, and functions. This is done in Queue.h. The functions are specifically implemented in Queue.c. The Queue.c is responsible for allocating dynamic memory for the Queue stack and maintaining the critical pointers to run it. Within the Queue, there are 4 major functions.  There is a Queue_Insert,Queue_Delete, PROCNODE_Insert, and PROCNODE_Delete. Queue_Insert inserts an item onto the queue, and Queue_Delete removes an item from the queue. PROCNODE_INSERT ] [This isn't used in the final copy, but was used to help prepare the simulator and organize the code.]
+SJF reads the queue in like any other function and uses nested for loops to implement all necessary swaps.  
+
+Round-Robin works in a similar manner as well. The IO_Queue, Ready_Queue,and Complete_Queue are each used at various 
+points to separate sorted processes from unsorted processes. TimeQ acts as the time quantum variable, which allows the 
+programmer latitude as far as setting the time quantum goes. The user doesn't have to set the time quantum to three, 
+even though these specific assignment specifications call for that. This code can be used in the future for other time 
+quantums by setting TimeQ to a variable. FIFO.c and FIFO.h are used immensely in order to organize the processes and 
+place them on appropriate queues at different points in the operation of the program.
+
+
+[To execute any particular sort, all of the processes must be place into a queue, and all operations must be performed 
+on this queue. This queue needs to be defined with a set of data structures, variables, and functions. This is done in 
+Queue.h. The functions are specifically implemented in Queue.c. The Queue.c is responsible for allocating dynamic memory
+for the Queue stack and maintaining the critical pointers to run it. Within the Queue, there are 4 major functions.  
+There is a Queue_Insert,Queue_Delete, PROCNODE_Insert, and PROCNODE_Delete. Queue_Insert inserts an item onto the queue,
+and Queue_Delete removes an item from the queue. PROCNODE_INSERT ] [This isn't used in the final copy, but was used to
+help prepare the simulator and organize the code.]

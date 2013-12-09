@@ -63,7 +63,7 @@ void FCFSSort(PROCESS Proc[], SIMULATION *Sim)
 {
     int i, j, Total = Sim->TotalProc;
 
-    for(i=0; i < Total; i++)
+    for(i=0; i < Total-1; i++)
     {
         for(j=0; j < Total-1; j++)
         {

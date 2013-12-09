@@ -24,7 +24,8 @@ void RoundRobin(PROCESS Proc[], SIMULATION *Sim, int TimeQuantum)
   FIFO* IOQueue;
   FIFO* Complete;
   PROCESS* CurrentProc;
-  int TimeQ = 0;//holds the TimeQuantum of the RR so it does not need to interfer with time on aquired cpu jobs finish
+  PROCESS* dataPtr;
+  int pos, Count, TimeQ = 0;//holds the TimeQuantum of the RR so it does not need to interfer with time on aquired cpu jobs finish
 
   ReadyQueue = F_PImport(Proc, Sim);
   IOQueue = F_Create();
@@ -33,7 +34,7 @@ void RoundRobin(PROCESS Proc[], SIMULATION *Sim, int TimeQuantum)
 //Simulate CPU
 //CurrentProc = F_DEL(ReadyQueue);
 
-  while(!F_Empty(ReadyQueue) || !F_Empty(IOQueue))
+  while(!F_Empty(ReadyQueue)|| !F_Empty(IOQueue) || (CurrentProc != NULL))
     {
       if(CurrentProc != NULL)
         {
@@ -50,8 +51,26 @@ void RoundRobin(PROCESS Proc[], SIMULATION *Sim, int TimeQuantum)
         }
 
       //Reset the CPU if the it hits the TimeQuantum or reached its CPU Burst
-          if(TimeQ%TimeQuantum == 0 || (CurrentProc->CPU_BURST == CurrentProc->CPU_Duration) || ((CurrentProc->IO_BURST > 0) && (CurrentProc->CPU_BURST/2 == CurrentProc->CPU_Duration)))
+
+      if((CurrentProc == NULL))
+        {
+          printf("CPU WAITING...\n");
+          printf("current state of ready queue: ");
+          F_DisplayContent(ReadyQueue);
+          printf("\n");
+          TimeQ=1;
+        }
+      else
+        {
+          if((TimeQ%TimeQuantum == 0 ) || (CurrentProc->CPU_BURST == CurrentProc->CPU_Duration) || ((CurrentProc->IO_BURST > 0) && (CurrentProc->CPU_BURST/2 == CurrentProc->CPU_Duration)))
             {
+
+              if(CurrentProc->CPU_BURST == CurrentProc->CPU_Duration)
+                {
+                  printf("JOB %i DONE\n", CurrentProc->P_ID);
+                  F_ADD(Complete,CurrentProc);
+
+                }
 
               if(CurrentProc != NULL && Sim->Time > 0)
                 {
@@ -61,7 +80,7 @@ void RoundRobin(PROCESS Proc[], SIMULATION *Sim, int TimeQuantum)
                     }
                 }
 
-              if(((Sim->Time%Sim->TimeInterval) == 0) && (!F_Empty(ReadyQueue)))
+              if(((Sim->Time%Sim->TimeInterval) == 0) )
                 {
                   printf("CPU loading job %i: ",F_ATProc(ReadyQueue,0)->P_ID);
                 }
@@ -70,58 +89,65 @@ void RoundRobin(PROCESS Proc[], SIMULATION *Sim, int TimeQuantum)
               if((CurrentProc->IO_BURST > 0) && (CurrentProc->CPU_BURST/2 == CurrentProc->CPU_Duration))
                 {
                   F_ADD(IOQueue,CurrentProc);
+
                 }
               else if((Sim->Time >0 ) && !(CurrentProc->CPU_BURST == CurrentProc->CPU_Duration))
                 {
                   F_ADD(ReadyQueue,CurrentProc);
+
                 }
 
-              if((!F_Empty(ReadyQueue)))
-                {
-                  DispBurst(F_ATProc(ReadyQueue,0));
-                }
 
-          printf("current state of ready queue: ");
-          F_DisplayContent(ReadyQueue);
-          printf("\n");
+              DispBurst(F_ATProc(ReadyQueue,0));
 
-          CurrentProc = F_DEL(ReadyQueue);
+              printf("current state of ready queue: ");
+              F_DisplayContent(ReadyQueue);
+              printf("\n");
 
-
-          TimeQ=1;
+              CurrentProc = F_DEL(ReadyQueue);
+              TimeQ=1;
+            }
+          else
+            {
+              TimeQ++;
+              printf("Servicing %s job %i: ",Sim->Schedule,CurrentProc->P_ID);
+              DispBurst(CurrentProc);
+              printf("current state of ready queue: ");
+              F_DisplayContent(ReadyQueue);
+              printf("\n");
+            }
+          F_Wait(ReadyQueue);
         }
-      else
-        {
-          TimeQ++;
-          printf("Servicing %s job %i: ",Sim->Schedule,CurrentProc->P_ID);
-          DispBurst(CurrentProc);
-          printf("current state of ready queue: ");
-          F_DisplayContent(ReadyQueue);
-          printf("\n");
-        }
+
 
 
       //F_CheckIO(IOQueue, ReadyQueue, Complete, Sim);
 
       //runsIO
-      //if(!F_RunIO(IOQueue, ReadyQueue, Sim))
-      {
-        printf("current state of device queue: ");
-        F_DisplayContent(IOQueue);
-        printf("\n");
-      }
+      if(!F_Empty(IOQueue))
+        {
+            Count = IOQueue->count;
+          for(pos = 0; pos < Count; pos++)
+            {
+                dataPtr = F_DEL (IOQueue);
+            if(dataPtr->IO_BURST == dataPtr->IO_Duration)
+                {
+                  printf("Job %i finished I/O burst\n",dataPtr->P_ID);
+                  F_ADD(ReadyQueue,dataPtr);
+                }
+                else
+                {
+                    dataPtr->IO_Duration++;
+                    F_ADD(IOQueue,dataPtr);
+                }
+            }
+        }
 
-
-
+      printf("current state of device queue: ");
+      F_DisplayContent(IOQueue);
+      printf("\n");
 
       Sim->Time++;
-
-              if(Sim->Time == 80)
-        {
-          F_ListProc(ReadyQueue);
-          F_ListProc(IOQueue);
-          return;
-        }
 
     }
   printf("Exiting\n");
@@ -139,9 +165,12 @@ void RoundRobin(PROCESS Proc[], SIMULATION *Sim, int TimeQuantum)
 //    F_ListProc(ReadyQueue);
 //}
   //F_ADD(ReadyQueue,CurrentProc);
+  printf("Ready Queue:\n");
   F_ListProc(ReadyQueue);
+  printf("Device Queue:\n");
   F_ListProc(IOQueue);
-
+  printf("Complete:\n");
+  F_ListProc(Complete);
 
 
 
@@ -151,4 +180,5 @@ void RoundRobin(PROCESS Proc[], SIMULATION *Sim, int TimeQuantum)
   F_Destroy(ReadyQueue);
   return 0;
 }
+
 

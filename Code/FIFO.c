@@ -241,7 +241,7 @@ FIFO* F_PImport(PROCESS Proc[], SIMULATION *Sim)
         }
 
       *dataPrt = Proc[pos];
-      printf("Inserted: %i\n",(dataPrt)->P_ID );
+      //printf("Inserted: %i\n",(dataPrt)->P_ID );
       F_ADD(fifo, dataPrt);
     }
 
@@ -252,7 +252,7 @@ FIFO* F_PImport(PROCESS Proc[], SIMULATION *Sim)
 void F_ListProc(FIFO *fifo)
 {
   int pos;
-  bool FullDisplay = true;
+  bool FullDisplay = false;
   PROCESS* dataPtr;
 
   if(FullDisplay == false)
@@ -262,8 +262,10 @@ void F_ListProc(FIFO *fifo)
       for(pos = 0; pos < fifo->count; pos++)
         {
           dataPtr = F_ATProc(fifo,pos);
-
+        if(dataPtr != NULL)
+        {
           printf("| %-7i | %-7i | %-7i | %-7i |\n", dataPtr->P_ID, dataPtr->CPU_BURST, dataPtr->IO_BURST, dataPtr->PRIORITY);
+        }
 
         }
       printf("+---------+---------+---------+---------+\n");
@@ -302,6 +304,26 @@ void F_Wait(FIFO* fifo)
   return;
 }
 
+void F_IODur(FIFO* fifo)
+{
+  FNODE* temp;
+
+  if(fifo->count == 0)//you wanted something beond what it had
+    {
+      return;
+    }
+
+  temp = fifo->front;
+
+  while (temp != NULL)
+    {
+      ((PROCESS*)temp->dataPtr)->IO_Duration++;
+      temp = temp->next;
+    }
+  return;
+}
+
+
 void F_DisplayContent(FIFO* fifo)
 {
   PROCESS* dataPtr;
@@ -330,19 +352,19 @@ bool F_RunIO(FIFO* IOQue, FIFO* ReadyQue, SIMULATION *Sim)
   int pos = 0;
   if(IOQue->count == 0)//you wanted something beond what it had
     {
-      return;
+      return found;
     }
 
-    //pluss all IO_Durations
+  //pluss all IO_Durations
   temp = IOQue->front;
 
   while (temp != NULL)
     {
-        ((PROCESS*)temp->dataPtr)->IO_Duration++;
-        temp = temp->next;
+      ((PROCESS*)temp->dataPtr)->IO_Duration++;
+      temp = temp->next;
     }
 
-if(Sim->Time%Sim->TimeInterval == 0)
+  if(Sim->Time%Sim->TimeInterval == 0)
     {
       if(Sim->IOJFinished != -1)
         {
@@ -359,7 +381,7 @@ if(Sim->Time%Sim->TimeInterval == 0)
 
           Sim->IOJFinished = -1;
         }
-        //F_ListProc(IOQue);
+      //F_ListProc(IOQue);
     }
   else
     {
@@ -369,7 +391,7 @@ if(Sim->Time%Sim->TimeInterval == 0)
         }
     }
 
-return true;
+  return true;
 //      //indicates that IO time is done
 //      if(((PROCESS*)temp->dataPtr)->IO_Duration == ((PROCESS*)temp->dataPtr)->IO_BURST)
 //        {
@@ -413,7 +435,7 @@ void F_CheckCPU(FIFO* IOQue, FIFO* ReadyQue, FIFO* Complete)
         }
       else if(( (F_ATProc(ReadyQue, pos))->CPU_BURST == (F_ATProc(ReadyQue, pos))->CPU_WITH_IO) && ((F_ATProc(ReadyQue, pos))->IO_BURST > 0))
         {
-            F_ADD(IOQue,F_DELAT(ReadyQue,pos));
+          F_ADD(IOQue,F_DELAT(ReadyQue,pos));
         }
     }
 }
